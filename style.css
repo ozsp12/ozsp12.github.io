@@ -1,5 +1,6 @@
-/* --- CONFIGURAÇÕES GERAIS --- */
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Bebas+Neue&family=Roboto+Condensed:wght@300;400;700&display=swap');
+/* CSS styles */
+
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
 
 * {
     margin: 0;
@@ -11,114 +12,738 @@
     scroll-behavior: smooth;
     font-family: 'Roboto Condensed', sans-serif;
     font-weight: 300;
-}
-
+  }
+  
 :root {
     --bg-color: #080808;
     --second-bg-color: #131313;
     --text-color: rgba(250, 255, 247, 0.904);
     --main-color: rgba(101, 199, 255, 0.74);
+    /*--main-color: rgba(63, 185, 255, 0.993);*/
 }
-
+  
 html {
     font-size: 60%;
     overflow-x: hidden;
     min-height: 100vh;
 }
-
+  
 body {
     min-height: 100vh;
     background: var(--bg-color);
     color: var(--text-color);
 }
-
-/* --- HEADER & NAVBAR --- */
+  
 .header {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     padding: 2rem 3%;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(5px);
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 100;
 }
-
+  
 .logo span {
-    color: var(--main-color);
-    font-family: 'Audiowide', sans-serif;
-    font-size: 3rem;
-    font-weight: 80;
-    transition: transform 0.3s ease, color 0.3s ease;
+  color: var(--main-color);
+  font-family: 'Audiowide', sans-serif;
+  font-size: 3rem;
+  font-weight: 80;
+  transition: transform 0.3s ease, color 0.3s ease; /* Transição suave */
 }
 
 .logo span:hover {
-    transform: scale(1.1);
-    color: rgb(224, 224, 224);
+  transform: scale(1.1); /* Aumenta o tamanho ao passar o mouse */
+  color: rgb(224, 224, 224); /* Muda a cor ao passar o mouse */
+}
+
+nav {
+    display: flex;
+    padding: 0 2%; /* Ajuste o padding para dar espaço nas laterais */
+    justify-content: flex-end; /* Alinha os itens à direita */
+    align-items: center;
 }
 
 .navbar {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-end; /* Alinha os itens à direita */
     align-items: center;
     flex-grow: 1;
 }
 
 .navbar ul {
     display: flex;
-    list-style: none;
+    list-style: none; /* Remove os marcadores de lista */
 }
 
 .navbar ul li {
     display: inline-block;
-    padding: 8px 15px;
+    padding: 8px 15px; /* Ajuste o padding para dar espaçamento adequado */
     position: relative;
 }
 
 .navbar a {
-    font-size: 1.6rem;
+    font-size: 1.6rem; /* Ajuste o tamanho da fonte para uma melhor legibilidade */
     color: var(--text-color);
-    margin: 0 1.5rem;
+    margin: 0 1.5rem; /* Ajuste a margem lateral para um espaçamento agradável */
     font-weight: 400;
-    text-transform: uppercase;
+    text-transform: uppercase; /* Torna os textos em caixa alta para um visual mais moderno */
     transition: 0.3s ease;
+    text-decoration: none; /* Remove o sublinhado padrão */
 }
 
 .navbar a:hover {
-    color: var(--main-color);
+    color: var(--main-color); /* Muda a cor ao passar o mouse */
+    text-decoration: none; /* Garante que o texto não fique sublinhado ao passar o mouse */
 }
 
-/* --- ELEMENTOS DESATIVADOS (ÍCONES E ANIMAÇÕES) --- */
-#menu-icon, #close-icon, .role-animation {
-    display: none !important;
+.navbar ul li::after {
+    content: '';
+    width: 0%;
+    height: 2px;
+    background: var(--main-color);
+    display: block;
+    margin: auto;
+    transition: width 0.3s ease; /* Transição suave para a largura da linha */
 }
 
-/* --- SEÇÃO HOME --- */
+.navbar ul li:hover::after {
+    width: 100%; /* Expande a linha para 100% no hover */
+}
+  
+/* Estilo para o ícone de menu */
+#menu-icon {
+  font-size: 3.6rem;
+  color: var(--main-color);
+  display: none; 
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 101; /* Garante sobreposição correta */
+}
+
+/* Estilo para o ícone de fechar */
+#close-icon {
+  font-size: 3.6rem;
+  color: var(--main-color);
+  display: none; /* Esconde o ícone inicialmente */
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 101; /* Sobrepõe corretamente */
+}
+
+/* Exibe o menu ao ativar */
+.navbar.active {
+  display: flex;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(69, 69, 73, 0.13);
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
 .home {
-    width: 100%;
-    height: 50vh;
-    min-height: 400px;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(circle at center, #1a1a1a 0%, #080808 100%);
+  position: relative;
+  width: 100%;
+  height: 30vh; /*100vh*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* Evita rolagem devido ao vídeo */
 }
 
+.background-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  object-fit: cover; /* Garante que o vídeo cubra toda a área */
+  z-index: -1; /* Coloca o vídeo atrás do conteúdo */
+}
+
+ 
+.home::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.685); /* ajuste o último valor para controlar a transparência */
+  z-index: 1;
+  }
+  
 .home-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
-
+ 
+/* Estilos para o nome */
 .home-content h1 {
     font-family: "Bebas Neue", sans-serif;
     font-size: 8rem;
     font-weight: 400;
-    color: var(--main-color);
+    color: rgba(101, 199, 255, 0.356);
     margin: 0;
-    padding-top: 5rem;
+    margin-top: -7rem;
+    opacity: 1; /* Nome inicialmente visível */
     transition: opacity 0.3s ease, transform 0.5s ease;
+}
+
+.role-animation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 4rem;
+    position: relative; /* Para que os itens fiquem sobrepostos */
+    width: 100%; /* Garantir que o container ocupe toda a largura disponível */
+    overflow: hidden; /* Impede que as palavras saiam da área visível */
+}
+  
+.role-text {
+  position: absolute; /* Fica sobreposta uma na outra */
+  font-size: 3rem;
+  color: var(--text-color);
+  opacity: 0; /* Começa invisível */
+  transition: opacity 1s ease-in-out; /* Suaviza a transição de visibilidade */
+  display: inline-block; /* Garante que as palavras ocupem o espaço adequado */
+  width: 100%; /* Cada palavra ocupa 100% da largura, evitando sobreposição */
+  text-align: center; /* Garante que o texto fique alinhado no centro */
+}
+
+.about {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding:2rem;
+}
+
+/* CSS para a Seção About - Tela Inteira */
+
+.about-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: auto; /* 100vh;  Garante altura mínima de uma viewport */
+  background-color: var(--bg-color);
+  padding: 0;
+  margin: 0; /* Remove margens */
+  position: relative; /* Adiciona posicionamento relativo */
+  overflow: hidden; /* Esconde qualquer overflow */
+}
+
+.about-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  max-width: 80%;
+  margin: 0 auto;
+  padding: 2rem 0;
+  position: relative;
+  z-index: 2;
+}
+
+.about-text {
+  max-width: 600px;
+}
+
+.about-text p {
+  margin-bottom: 15px;
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  font-weight: 300;
+  text-align: justify;
+  line-height: 1.8;
+}
+
+.about-img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.about-img img {
+  width: 200%;
+  max-width: 380px;
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--main-color);
+  cursor: pointer;
+  transition: 0.4s ease-in-out;
+}
+
+
+.heading {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--text-color);
+  text-align: center;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+}
+
+.about-me-section {
+  text-align: center; /* Centraliza todo o texto */
+  padding: 50px 20px; /* Espaçamento interno */
+  background-color: #080808; /* Cor de fundo suave */
+}
+
+.about-me-section h2 {
+  font-size: 3rem;
+  margin-top: -50px;
+  margin-bottom: 2rem; /* Ajusta o espaço abaixo do título */
+}
+
+.about-me-text p {
+  margin-bottom: 15px;
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  font-weight: 300;
+  text-align: justify;
+  line-height: 2.0;
+  max-width: 800px; /* Limita a largura do texto */
+  margin: 0 auto; /* Centraliza horizontalmente */
+}
+
+.separator {
+  border: none; /* Remove a borda padrão */
+  height: 1px; /* Define a espessura da linha */
+  background-color: var(--main-color); /* Usa a cor principal */
+  width: 70%; /* Define a largura da linha */
+  margin: 20px auto; /* Centraliza e dá espaço acima/abaixo */
+}
+
+/* Ajuste no footer */
+.footer {
+  width: 100%;
+  padding: 40px 0;
+  background-color: var(--bg-color);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0; /* Garante que não haja margem inferior */
+  border-bottom: none; /* Remove qualquer borda que possa estar criando espaço */
+}
+
+.footer .social {
+  padding-bottom: 25px;
+  margin-bottom: 0; /* Remove margem inferior */
+}
+
+.footer .social a {
+  font-size: 24px;
+  color: var(--main-color);
+  display: inline-flex; /* Flex para centralizar */
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  margin: 0 8px;
+  transition: all 0.3s ease-in-out;
+}
+
+.footer .social a span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--main-color); /* Contorno */
+  border-radius: 50%;
+  padding: 8px;
+  transition: 0.3s ease-in-out;
+  
+}
+
+.footer .social a:hover span {
+  background-color: var(--main-color); /* Fundo ao passar o mouse */
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(var(--main-color), 0.8); /* Aumenta o brilho no hover */
+}
+
+.footer .social a:hover {
+  transform: scale(1.15); /* Aumento sutil */
+  background-color: var(--main-color); /* Fundo sólido ao passar o mouse */
+  color: white; /* Ícone branco ao passar o mouse */
+}
+
+.footer .social:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.education {
+  padding: 20px 15px;
+  margin-top: 20px;
+  margin-bottom: 0; /* Remove a margem inferior extra */
+  background: var(--bg-color);
+}
+
+.education h2{
+  font-size: 3rem;
+  margin-top: 0; /*-100px; */
+  margin-bottom: 2rem; /* Ajusta o espaço abaixo do título */
+  background-color: var(--bg-color);
+}
+
+/* Contêiner principal da timeline horizontal */
+.horizontal-timeline-items {
+  display: flex;
+  background-color: var(--bg-color);
+  justify-content: space-between; /* Espaço igual entre os itens */
+  align-items: center;
+  flex-wrap: nowrap; /* Mantém os itens na mesma linha */
+  max-width: 100%;
+  margin: auto;
+  padding: 20px 15px;
+  overflow-x: auto; /* Adiciona rolagem horizontal caso os itens ultrapassem a tela */
+  position: relative;
+}
+
+
+
+/* Linha da timeline horizontal */
+.horizontal-timeline-items::before {
+  content: "";
+  position: absolute;
+  width: 90%;
+  height: 2px;
+  background-color: var(--main-color);
+  top: 50%;
+  left: 5%;
+  z-index: 0;
+}
+
+/* Estilo do item da timeline horizontal */
+.horizontal-timeline-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Alinha os itens no centro */
+  position: relative;
+  text-align: center;
+  width: 30%; /* Largura menor para cada item */
+  margin: 0 20px; /* Espaço entre os itens */
+}
+
+/* Estilo dos pontos na timeline horizontal */
+.horizontal-timeline-dot {
+  height: 16px; /* Ponto menor */
+  width: 16px; /* Ponto menor */
+  background-color: var(--main-color); /* Cor do ponto */
+  border-radius: 50%; /* Ponto redondo */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Sombras suaves no ponto */
+  margin-bottom: 10px; /* Espaço abaixo do ponto */
+}
+
+/* Estilo da data na timeline horizontal */
+.horizontal-timeline-date {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 5px 0 10px; /* Menos margem */
+}
+
+/* Estilo do conteúdo na timeline horizontal */
+.horizontal-timeline-content {
+  background-color: var(--second-bg-color); /* Cor suave para o fundo */
+  border: 2px solid var(--main-color); /* Borda sutil */
+  padding: 15px 25px;
+  border-radius: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombras suaves */
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efeito de hover no conteúdo da timeline horizontal */
+.horizontal-timeline-content:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Sombras mais suaves no hover */
+}
+
+/* Estilo do título dentro do conteúdo na timeline horizontal */
+.horizontal-timeline-content h3 {
+  font-size: 18px;
+  color: var(--text-color);
+  margin: 0 0 12px;
+  font-weight: 400; /* Fonte mais leve */
+}
+
+/* Estilo do parágrafo dentro do conteúdo na timeline horizontal */
+.horizontal-timeline-content p {
+  font-size: 14px;
+  color: var(--text-color);
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* Linha vertical conectando o ponto à linha horizontal */
+.horizontal-timeline-items::before {
+  content: "";
+  position: absolute;
+  width: 90%;
+  height: 2px;
+  background-color: var(--main-color);
+  top: 50%;
+  left: 5%;
+  z-index: 0;
+}
+
+/* Mantém o ponto sobre a linha */
+.horizontal-timeline-dot {
+  position: relative;
+  z-index: 2;
+  background-color: var(--main-color);
+  border: 2px solid var(--bg-color);
+}
+
+.footer_credit {
+  background-color: var(--bg-color);  /* Cor de fundo escura */
+  color: #fff;  /* Texto branco */
+  text-align: center;
+  padding: 15px;
+  font-size: 11px;
+  width: 100%;
+}
+
+.footer_credit a {
+  color: #ffffff;  /* Cor dourada para o link */
+  text-decoration: none;
+}
+
+.footer_credit a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    display: none; /* Esconde o menu padrão inicialmente */
+    flex-direction: column; /* Alinha os itens verticalmente */
+  }
+
+  #menu-icon {
+    display: block; /* Mostra o ícone de menu */
+  }
+
+  .navbar.active {
+    display: flex; /* Mostra o menu quando ativo */
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: rgba(34, 34, 36, 0.9); /* Fundo mais escuro e opaco */
+    width: 70%; /* O menu ocupará 70% da largura da tela */
+    height: 100vh; /* Ocupa toda a altura */
+    flex-direction: column;
+    align-items: center;
+    z-index: 100; /* Fica acima de outros elementos */
+    padding-top: 60px; /* Espaço para o ícone de fechar */
+  }
+
+  .navbar ul {
+    flex-direction: column; /* Alinha itens verticalmente */
+    width: 100%;
+    text-align: center;
+    padding: 0;
+  }
+
+  .navbar ul li {
+    margin: 20px 0; /* Espaçamento entre itens */
+    width: 100%;
+  }
+
+  .navbar ul li a {
+    display: block;
+    padding: 15px 0;
+    color: white; /* Cor do texto, pode ser ajustada */
+    font-size: 1.6rem;
+    text-decoration: none;
+    width: 100%;
+  }
+
+  /* Estilo do ícone de fechar (X) */
+  #close-icon {
+    display: none; /* Inicialmente escondido */
+  }
+
+  .navbar.active + #close-icon {
+    display: block; /* Mostra o ícone quando o menu está ativo */
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 3.6rem;
+    color: var(--main-color);
+    cursor: pointer;
+  }
+
+  /* Home Section */
+  .home-content h1 {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 8rem;
+    font-weight: 400;
+    color: rgba(101, 199, 255, 0.356);
+    margin: 0;
+    margin-top: 2rem; /* Mude de -7rem para um valor positivo para separar do texto de cima */
+    opacity: 1;
+    transition: opacity 0.3s ease, transform 0.5s ease;
+  }
+  
+  .role-animation {
+    height: 3rem; /* Ajusta a altura do container */
+  }
+
+  .role-text {
+    font-size: 2rem; /* Reduz o tamanho do texto */
+  }
+
+  /* About Section */
+  .about-section {
+    flex-direction: column; /* Empilha conteúdo verticalmente */
+    padding: 2rem; /* Adiciona espaço ao redor */
+  }
+
+  .about-content {
+    flex-direction: column; /* Coloca texto e imagem em coluna */
+    gap: 1rem; /* Reduz o espaçamento entre os elementos */
+    max-width: 90%; /* Limita a largura do conteúdo */
+  }
+
+  .about-text p {
+    font-size: 1.2rem; /* Reduz tamanho da fonte */
+    line-height: 1.5; /* Reduz o espaçamento entre linhas */
+    text-align: center; /* Centraliza o texto */
+  }
+
+  .about-img img {
+    width: 80%; /* Ajusta a largura da imagem */
+    max-width: 250px; /* Define um limite para o tamanho da imagem */
+  }
+
+  .heading {
+    font-size: 2.5rem; /* Reduz tamanho do cabeçalho */
+    margin-bottom: 1.5rem;
+  }
+
+  /* Footer Section */
+  .footer {
+    padding: 20px 0; /* Reduz o padding */
+  }
+
+  .footer .social {
+    margin: 0; /* Remove margens negativas */
+    padding: 1rem 0;
+  }
+
+  .footer .social a {
+    font-size: 20px; /* Reduz o tamanho dos ícones */
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    margin: 0 5px;
+  }
+  .horizontal-timeline-items {
+    flex-direction: column; /* Alinha os itens da timeline na vertical */
+    padding: 0; /* Remove o padding lateral */
+    justify-content: center; /* Centraliza os itens verticalmente */
+    align-items: center; /* Centraliza os itens */
+    overflow-x: visible; /* Remove a rolagem horizontal */
+  }
+
+  .horizontal-timeline-item {
+    width: 80%; /* Ajusta a largura para ser maior em telas pequenas */
+    margin: 10px 0; /* Adiciona um pequeno espaço entre os itens */
+  }
+
+  .horizontal-timeline-items::before {
+    display: none; /* Remove a linha da timeline na versão mobile */
+  }
+  
+  .horizontal-timeline-dot {
+    margin-bottom: 10px; /* Ajusta o espaçamento do ponto */
+  }
+
+  .horizontal-timeline-content {
+    width: 100%; /* Ajusta o conteúdo para ocupar toda a largura */
+    padding: 15px 20px; /* Ajusta o padding para dar mais espaço */
+  }
+}
+
+.contact-content {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  text-align: center;
+  z-index: 1;
+}
+
+  
+.contact-content h1 {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 7rem; /* Ajuste o tamanho do título */
+    color: rgba(101, 199, 255, 0.774);
+    margin: 0;
+    opacity: 1;
+    transition: opacity 0.3s ease, transform 0.5s ease;
+}
+
+.contact-links {
+  margin-top: 10px;
+  padding: 5rem 10%;
+  text-align: center;
+  position: relative; /* Garante que o z-index funcione */
+  z-index: 10; /* Valor superior para ficar acima de outros elementos */
+  background-color: #1b1b1b42;
+  color: var(--text-color);
+}
+
+.contact-container h2 {
+  font-size: 2.5rem;
+  color: var(--text-color);
+  margin-bottom: 20px;
+}
+
+.contact-container ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.contact-container li {
+  margin: 10px 0; /* Espaçamento entre os itens */
+}
+
+.contact-container a {
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 1.8rem;
+  color: var(--main-color);
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.contact-container a:hover {
+  color: white; /* Cor ao passar o mouse */
+  transform: translateY(-2px); /* Leve deslocamento */
+}
