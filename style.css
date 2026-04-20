@@ -193,7 +193,7 @@ nav {
     /* Ajuste este valor para centralizar o nome no vídeo/fundo */
     margin-top: 5rem !important; 
     transition: opacity 0.3s ease, transform 0.5s ease;
-}
+} 
  
 /* Remove completamente a animação e os textos de profissão */
 .role-animation, 
