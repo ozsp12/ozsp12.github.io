@@ -1,71 +1,51 @@
-/* --- CONFIGURAÇÕES GERAIS & VARIÁVEIS --- */
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Bebas+Neue&family=Roboto+Condensed:wght@300;400&display=swap');
+/* --- SETUP & VARIÁVEIS --- */
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Bebas+Neue&family=Roboto+Condensed:wght@300;400;700&display=swap');
 
 :root {
     --bg-color: #080808;
-    --second-bg-color: #131313;
-    --text-color: rgba(250, 255, 247, 0.9);
-    --main-color: rgba(101, 199, 255, 0.74);
+    --second-bg-color: #111111;
+    --text-color: #ffffff;
+    --main-color: rgba(101, 199, 255, 0.8);
     --transition: 0.3s ease-in-out;
 }
- 
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     scroll-behavior: smooth;
-    font-family: 'Roboto Condensed', sans-serif;
 }
 
 html {
-    font-size: 60%;
-    overflow-x: hidden;
+    font-size: 62.5%; /* 1rem = 10px */
 }
 
 body {
     background: var(--bg-color);
     color: var(--text-color);
-    font-weight: 300;
+    font-family: 'Roboto Condensed', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
 }
 
-/* --- COMPONENTES REUTILIZÁVEIS --- */
-.flex-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.heading {
-    font-size: 3rem;
-    font-weight: bold;
-    text-align: center;
-    margin: 1rem 0 2rem;
-}
-
-/* --- HEADER & NAVBAR --- */
+/* --- HEADER --- */
 .header {
     position: fixed;
     top: 0;
     width: 100%;
-    padding: 2rem 3%;
+    padding: 2rem 5%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 100;
-    background: transparent;
+    background: rgba(8, 8, 8, 0.7);
+    backdrop-filter: blur(10px);
 }
 
 .logo span {
     font-family: 'Audiowide', sans-serif;
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: var(--main-color);
-    transition: var(--transition);
-    display: inline-block;
-}
-
-.logo span:hover {
-    transform: scale(1.1);
-    color: #e0e0e0;
 }
 
 .navbar ul {
@@ -74,9 +54,9 @@ body {
 }
 
 .navbar a {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     color: var(--text-color);
-    margin: 0 1.5rem;
+    margin-left: 3rem;
     font-weight: 400;
     text-transform: uppercase;
     transition: var(--transition);
@@ -86,175 +66,141 @@ body {
     color: var(--main-color);
 }
 
-/* --- SEÇÃO HOME (BANNER) --- */
+/* --- SEÇÃO HOME (CORREÇÃO DA FAIXA PRETA) --- */
 .home {
-    position: relative;
-    height: 50vh;
-    min-height: 400px;
-    width: 100%;
-    overflow: hidden;
-    @extend .flex-center; /* Conceitual */
-    display: flex; align-items: center; justify-content: center;
-}
-
-.background-video {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -1;
-}
-
-.home::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.68);
-    z-index: 1;
-}
-
-.home-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
+    height: 45vh;
+    min-height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, #1a1a1a 0%, #080808 100%);
+    border-bottom: 1px solid rgba(101, 199, 255, 0.1);
 }
 
 .home-content h1 {
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 8rem;
-    color: rgba(101, 199, 255, 0.35);
-    margin-top: 2rem; /* Valor corrigido para não sobrepor menu */
-    transition: var(--transition);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 10vw, 8.5rem);
+    color: var(--main-color);
+    text-align: center;
+    padding-top: 6rem;
+    letter-spacing: 3px;
 }
-
-/* Elementos desativados conforme seu pedido anterior */
-.role-animation { display: none !important; }
 
 /* --- SEÇÃO ABOUT --- */
 .about-section {
-    padding: 4rem 0;
+    padding: 10rem 8%;
     background: var(--bg-color);
 }
 
 .about-content {
-    display: flex;
-    max-width: 80%;
+    max-width: 1200px;
     margin: 0 auto;
-    gap: 3rem;
+    display: flex;
     align-items: center;
-    justify-content: center;
-}
-
-.about-text p {
-    max-width: 600px;
-    font-size: 1.5rem;
-    line-height: 1.8;
-    text-align: justify;
-    margin: 1rem 0 1.5rem;
+    gap: 6rem;
 }
 
 .about-img img {
-    max-width: 300px; /* Reduzi para um tamanho mais equilibrado */
+    width: 280px;
+    height: 280px;
     border-radius: 50%;
-    box-shadow: 0 0 15px var(--main-color);
-    transition: var(--transition);
+    object-fit: cover;
+    box-shadow: 0 0 25px var(--main-color);
 }
 
-/* --- SEÇÃO EDUCATION (TIMELINE) --- */
+.about-text h2 {
+    font-size: 3.5rem;
+    margin-bottom: 2rem;
+    color: var(--main-color);
+}
+
+.about-text p {
+    font-size: 1.6rem;
+    text-align: justify;
+    color: #ddd;
+    font-weight: 300;
+}
+
+/* --- SEÇÃO EDUCATION --- */
 .education {
-    padding: 4rem 15px;
-    background: var(--bg-color);
+    padding: 10rem 8%;
+    background: var(--second-bg-color);
+}
+
+.education h2 {
+    text-align: center;
+    font-size: 3.5rem;
+    margin-bottom: 6rem;
+    color: var(--main-color);
 }
 
 .horizontal-timeline-items {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    padding: 20px 0;
-    overflow-x: auto;
-}
-
-.horizontal-timeline-items::before {
-    content: "";
-    position: absolute;
-    top: 50%; width: 100%; height: 2px;
-    background: var(--main-color);
-    z-index: 0;
-}
-
-.horizontal-timeline-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 1;
-}
-
-.horizontal-timeline-dot {
-    width: 16px; height: 16px;
-    background: var(--main-color);
-    border-radius: 50%;
-    border: 2px solid var(--bg-color);
-    margin-bottom: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 4rem;
 }
 
 .horizontal-timeline-content {
-    background: var(--second-bg-color);
-    border: 2px solid var(--main-color);
-    padding: 1.5rem 2.5rem;
-    border-radius: 2rem;
+    background: var(--bg-color);
+    padding: 3rem;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(101, 199, 255, 0.3);
     transition: var(--transition);
 }
 
 .horizontal-timeline-content:hover {
-    transform: translateY(-5px);
+    transform: translateY(-1rem);
+    border-color: var(--main-color);
+    box-shadow: 0 10px 30px rgba(101, 199, 255, 0.1);
 }
 
-/* --- CONTACT & FOOTER --- */
-.contact-links {
-    padding: 5rem 10%;
-    background: rgba(27, 27, 27, 0.2);
-    text-align: center;
-}
-
-.contact-container ul { list-style: none; }
-
-.contact-container a {
-    font-size: 1.8rem;
+.horizontal-timeline-content h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
     color: var(--main-color);
-    transition: var(--transition);
 }
 
+/* --- FOOTER --- */
 .footer {
-    padding: 3rem 0;
+    padding: 6rem 0;
     text-align: center;
+    background: var(--bg-color);
+    border-top: 1px solid #1a1a1a;
 }
 
-.footer .social a {
+.social {
+    margin-bottom: 2rem;
+}
+
+.social a {
     display: inline-flex;
-    width: 44px; height: 44px;
+    align-items: center;
+    justify-content: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    background: transparent;
     border: 2px solid var(--main-color);
     border-radius: 50%;
-    margin: 0 8px;
-    align-items: center; justify-content: center;
+    font-size: 2rem;
     color: var(--main-color);
+    margin: 0 1rem;
     transition: var(--transition);
 }
 
-.footer .social a:hover {
+.social a:hover {
     background: var(--main-color);
-    color: white;
+    color: var(--bg-color);
+    box-shadow: 0 0 15px var(--main-color);
 }
 
-/* --- RESPONSIVIDADE (MEDIA QUERIES) --- */
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 991px) {
+    .header { padding: 2rem 3%; }
+    .about-content { flex-direction: column; text-align: center; }
+}
+
 @media (max-width: 768px) {
-    .about-content, .horizontal-timeline-items {
-        flex-direction: column;
-    }
-
-    .horizontal-timeline-items::before { display: none; }
-
-    .about-img img { max-width: 200px; }
-
-    .home-content h1 { font-size: 5rem; }
+    .navbar { display: none; } /* Menu mobile precisa de JS para abrir */
+    .home { height: 35vh; }
+    .about-img img { width: 200px; height: 200px; }
 }
