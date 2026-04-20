@@ -19,7 +19,6 @@
     --text-color: rgba(250, 255, 247, 0.904);
     --main-color: rgba(101, 199, 255, 0.74);
 }
-  
 
 html {
     font-size: 60%;
@@ -59,8 +58,7 @@ body {
     color: rgb(224, 224, 224);
 }
   
-  /* Navbar */
-
+/* Navbar */
 nav {
     display: flex;
     padding: 0 2%; /* Ajuste o padding para dar espaço nas laterais */
@@ -458,9 +456,9 @@ nav {
       margin: 1rem;
   }
 
-  .research-areas {
+  /* .research-areas {
     margin-top: -450px; /* Ajuste o valor para posicionar melhor */
-  }
+  } */
 
 }
   
