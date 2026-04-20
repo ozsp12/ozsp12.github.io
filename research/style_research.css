@@ -199,8 +199,9 @@ nav {
 
 /* Research Areas Section */
 .research-areas {
-  margin-top: -200px;
-  padding: 2rem 5% 4rem;
+  margin-top: -350px;
+  padding: 8rem 5% 4rem;
+  background: var(--bg-color);
 }
 
 .research-areas h1 {
