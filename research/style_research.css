@@ -153,8 +153,9 @@ nav {
 
 .home {
   position: relative;
+  height: auto;
+  padding-top: 120px;
   width: 100%;
-  height: 100vh; /* Ajuste conforme necessário */
   overflow: hidden;
 }
 
