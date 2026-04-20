@@ -174,20 +174,6 @@ nav {
 }
 
 .home::before {
-  background-color: transparent;
-}
-
-.home-content {
-  position: relative;
-  z-index: 2;
-}
-
-.home-content h1 {
-  position: relative;
-  z-index: 3;
-}
-  
-/* .home::before {
   content: "";
   position: absolute;
   top: 0;
@@ -196,9 +182,9 @@ nav {
   height: 100%;
   background-color: transparent;
   z-index: 1;
-  } */
+  }
   
-/* .home-content h1 {
+.home-content h1 {
     font-family: "Bebas Neue", sans-serif;
     font-size: 8rem;
     font-weight: 400;
@@ -210,35 +196,10 @@ nav {
     letter-spacing: 3px;
     margin: 0;
     /* Ajuste este valor para centralizar o nome no vídeo/fundo */
-    /* margin-top: 5rem !important; 
+    margin-top: 5rem !important; 
     transition: opacity 0.3s ease, transform 0.5s ease; */
-}  */
+} 
  
-/* Remove completamente a animação e os textos de profissão */
-.role-animation, 
-.role-text,
-.home-content .role-animation,
-.home-content .role-text {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    pointer-events: none !important;
-}
-  
-.role-text {
-  position: absolute; /* Fica sobreposta uma na outra */
-  font-size: 3rem;
-  color: var(--text-color);
-  opacity: 0; /* Começa invisível */
-  transition: opacity 1s ease-in-out; /* Suaviza a transição de visibilidade */
-  display: inline-block; /* Garante que as palavras ocupem o espaço adequado */
-  width: 100%; /* Cada palavra ocupa 100% da largura, evitando sobreposição */
-  text-align: center; /* Garante que o texto fique alinhado no centro */
-}
-
 .about {
   display: flex;
   flex-direction: column;
