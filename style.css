@@ -182,23 +182,25 @@ nav {
   height: 100%;
   background-color: transparent;
   z-index: 1;
-  }
-  
+}
+
 .home-content h1 {
     font-family: "Bebas Neue", sans-serif;
     font-size: 8rem;
     font-weight: 400;
     color: #65c7ff;
+
     text-shadow: 
         0 0 15px #65c7ff,
         0 0 30px #65c7ff,
         0 0 60px rgba(101, 199, 255, 0.6);
+
     letter-spacing: 3px;
     margin: 0;
-    /* Ajuste este valor para centralizar o nome no vídeo/fundo */
-    margin-top: 5rem !important; 
-    transition: opacity 0.3s ease, transform 0.5s ease; */
-} 
+    margin-top: 5rem !important;
+
+    transition: opacity 0.3s ease, transform 0.5s ease;
+}
  
 .about {
   display: flex;
