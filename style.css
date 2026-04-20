@@ -395,8 +395,8 @@ nav {
 }
 
 .education {
-  padding: 100px 15px;
-  margin-top: 50px;
+  padding: 60px 15px;
+  margin-top: 30px;
   margin-bottom: 0; /* Remove a margem inferior extra */
   background: var(--bg-color);
 }
