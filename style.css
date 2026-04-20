@@ -403,7 +403,7 @@ nav {
 
 .education h2{
   font-size: 3rem;
-  margin-top: -100px;
+  margin-top: 0; /*-100px; */
   margin-bottom: 2rem; /* Ajusta o espaço abaixo do título */
   background-color: var(--bg-color);
 }
