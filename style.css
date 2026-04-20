@@ -172,8 +172,22 @@ nav {
   object-fit: cover; /* Garante que o vídeo cubra toda a área */
   z-index: -1; /* Coloca o vídeo atrás do conteúdo */
 }
-  
+
 .home::before {
+  background-color: transparent;
+}
+
+.home-content {
+  position: relative;
+  z-index: 2;
+}
+
+.home-content h1 {
+  position: relative;
+  z-index: 3;
+}
+  
+/* .home::before {
   content: "";
   position: absolute;
   top: 0;
@@ -182,9 +196,9 @@ nav {
   height: 100%;
   background-color: transparent;
   z-index: 1;
-  }
+  } */
   
-.home-content h1 {
+/* .home-content h1 {
     font-family: "Bebas Neue", sans-serif;
     font-size: 8rem;
     font-weight: 400;
@@ -196,9 +210,9 @@ nav {
     letter-spacing: 3px;
     margin: 0;
     /* Ajuste este valor para centralizar o nome no vídeo/fundo */
-    margin-top: 5rem !important; 
-    transition: opacity 0.3s ease, transform 0.5s ease;
-} 
+    /* margin-top: 5rem !important; 
+    transition: opacity 0.3s ease, transform 0.5s ease; */
+}  */
  
 /* Remove completamente a animação e os textos de profissão */
 .role-animation, 
