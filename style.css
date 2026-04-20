@@ -209,7 +209,7 @@ nav {
 }
 
 .role-animation {
-    display: display: none !important; /*flex;*/
+    display: none !important; /*flex;*/
     justify-content: center;
     align-items: center;
     height: 4rem;
