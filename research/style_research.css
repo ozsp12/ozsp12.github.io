@@ -152,7 +152,7 @@ nav {
 .home {
   position: relative;
   width: 100%;
-  height: 100vh; /* Ajuste conforme necessário */
+  height: 350px; /* Reduzido de 100vh para 350px (pouco maior que os 300px da imagem) */
   overflow: hidden;
 }
 
