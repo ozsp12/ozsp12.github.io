@@ -171,7 +171,8 @@ nav {
 
 .research-content {
   position: absolute;
-  top: 25%;
+  top: 50%; /* Mude para 50% ou 60% para centralizar melhor no novo espaço */
+  /* Se preferir um controle mais exato, use pixels: top: 180px; */
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 3rem;
