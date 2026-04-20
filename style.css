@@ -208,9 +208,20 @@ nav {
   align-items: center;
   text-align: center;
 } */
+
+.home-content h1 {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 8rem;
+    font-weight: 400;
+    color: rgba(101, 199, 255, 0.356);
+    margin: 0;
+    /* Ajuste este valor para centralizar o nome no vídeo/fundo */
+    margin-top: 5rem !important; 
+    transition: opacity 0.3s ease, transform 0.5s ease;
+}
  
 /* Estilos para o nome */
-.home-content h1 {
+/* .home-content h1 {
     font-family: "Bebas Neue", sans-serif;
     font-size: 8rem;
     font-weight: 400;
@@ -219,7 +230,7 @@ nav {
     margin-top: -7rem;
     opacity: 1; /* Nome inicialmente visível */
     transition: opacity 0.3s ease, transform 0.5s ease;
-}
+} */
 
 /* .role-animation {
     display: flex;
