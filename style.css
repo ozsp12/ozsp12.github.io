@@ -32,7 +32,7 @@ body {
     color: var(--text-color);
 }
   
-.header {
+/* .header {
     position: fixed;
     top: 0;
     left: 0;
@@ -40,6 +40,22 @@ body {
     padding: 2rem 3%;
     background: rgba(0, 0, 0, 0);
     backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+} */
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem 3%;
+    background: rgba(0, 0, 0, 0.8); /* Cor de fundo (ajuste o 0.8 para mais ou menos transparência) */
+    
+    /* backdrop-filter: blur(5px); */  <-- COMENTE OU APAGUE ESTA LINHA
+    
     display: flex;
     justify-content: space-between;
     align-items: center;
