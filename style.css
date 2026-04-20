@@ -205,7 +205,7 @@ nav {
     transition: opacity 0.3s ease, transform 0.5s ease;
 }
 
-.role-animation {
+/* .role-animation {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -213,6 +213,20 @@ nav {
     position: relative; /* Para que os itens fiquem sobrepostos */
     width: 100%; /* Garantir que o container ocupe toda a largura disponível */
     overflow: hidden; /* Impede que as palavras saiam da área visível */
+} */
+
+/* Remove completamente a animação e os textos de profissão */
+.role-animation, 
+.role-text,
+.home-content .role-animation,
+.home-content .role-text {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: none !important;
 }
   
 .role-text {
