@@ -188,8 +188,9 @@ nav {
     font-family: "Bebas Neue", sans-serif;
     font-size: 8rem;
     font-weight: 400;
-    color: #8ed8ff;   /* mesma cor do RESEARCH */
-    text-shadow: none;  /* remove completamente o brilho */
+    color: #8ed8ff;
+    text-shadow: none !important;
+    filter: none !important;
     letter-spacing: 3px;
     margin: 0;
     margin-top: 5rem !important;
