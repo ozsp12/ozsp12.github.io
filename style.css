@@ -38,7 +38,8 @@ body {
     left: 0;
     width: 100%;
     padding: 2rem 3%;
-    background: transparent;
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(6px);
     display: flex;
     justify-content: space-between;
     align-items: center;
