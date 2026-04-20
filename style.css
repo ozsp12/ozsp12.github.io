@@ -157,7 +157,7 @@ nav {
 .home {
   position: relative;
   width: 100%;
-  height: 30vh; /*100vh*/
+  height: 50vh; /*100vh*/
   display: flex;
   justify-content: center;
   align-items: center;
