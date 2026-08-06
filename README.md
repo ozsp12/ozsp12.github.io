@@ -2,7 +2,7 @@
 
 Site estático completo (PT/EN), sem framework e sem build, pronto para GitHub Pages.
 
-## Estrutura
+# Estrutura
 
 ```
 osvaldo-personal-site/
@@ -25,7 +25,7 @@ osvaldo-personal-site/
 
 Cada página é um arquivo HTML puro — sem dependências de build, Node.js ou framework.
 
-## Publicar no GitHub Pages (ozsp12/ozsp12.github.io)
+# Publicar no GitHub Pages (ozsp12/ozsp12.github.io)
 
 1. Copie todo o conteúdo desta pasta para a raiz do repositório `ozsp12/ozsp12.github.io` (substituindo o que já existir lá).
 2. Commit e push na branch usada pelo Pages (normalmente `main`).
