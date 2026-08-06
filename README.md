@@ -2,7 +2,7 @@
 
 Static, bilingual, multipage website prepared for `ozsp12/ozsp12.github.io`.
 
-## What is included
+# What is included
 
 - Real static routes in Portuguese and English
 - No React, Babel, Node.js, build process, or server dependency
@@ -13,7 +13,7 @@ Static, bilingual, multipage website prepared for `ozsp12/ozsp12.github.io`.
 - Compatibility redirects for `/research/`, `/notes/`, and `/repos/`
 - `404.html`, `robots.txt`, `sitemap.xml`, and `.nojekyll`
 
-## Deployment
+# Deployment
 
 The ZIP is structured with `index.html` at its root. To replace the current site cleanly:
 
