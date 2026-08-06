@@ -1,4 +1,4 @@
-# Dr. Osvaldo L. Santos-Pereira — Personal Academic Site
+# Dr. Osvaldo L. Santos-Pereira - Personal Academic Site
 
 Site estático completo (PT/EN), sem framework e sem build, pronto para GitHub Pages.
 
