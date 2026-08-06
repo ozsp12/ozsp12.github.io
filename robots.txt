@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://ozsp12.github.io/sitemap.xml

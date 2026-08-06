@@ -1,51 +1,54 @@
-# Dr. Osvaldo L. Santos-Pereira — Personal Website
+# Dr. Osvaldo L. Santos-Pereira — Personal Academic Site
 
-Static, bilingual, multipage website prepared for `ozsp12/ozsp12.github.io`.
+Site estático completo (PT/EN), sem framework e sem build, pronto para GitHub Pages.
 
-# What is included
+## Estrutura
 
-- Real static routes in Portuguese and English
-- No React, Babel, Node.js, build process, or server dependency
-- Responsive navigation and accessible focus states
-- Page-specific SEO metadata, canonical URLs, and `hreflang`
-- Publications organized by year with clickable DOI and arXiv links
-- Institutional contact page
-- Compatibility redirects for `/research/`, `/notes/`, and `/repos/`
-- `404.html`, `robots.txt`, `sitemap.xml`, and `.nojekyll`
-
-# Deployment
-
-The ZIP is structured with `index.html` at its root. To replace the current site cleanly:
-
-```bash
-git clone https://github.com/ozsp12/ozsp12.github.io.git
-cd ozsp12.github.io
-
-git branch backup-before-redesign
-git push origin backup-before-redesign
-
-# Remove the previous working-tree files, preserving .git
-git rm -r --ignore-unmatch .
-
-# Extract the contents of ozsp12-github-pages-final.zip into this directory
-git add .
-git commit -m "Rebuild personal website as a bilingual static site"
-git push origin main
+```
+osvaldo-personal-site/
+├── index.html              redireciona para /pt/ ou /en/ (conforme idioma do navegador)
+├── pt/                      versão em português
+│   ├── index.html           Landing Page  → /pt/
+│   ├── about/index.html     → /pt/about/
+│   ├── teaching/index.html  → /pt/teaching/
+│   ├── research/index.html  → /pt/research/
+│   ├── publications/index.html → /pt/publications/
+│   ├── blog/index.html      → /pt/blog/
+│   └── contact/index.html   → /pt/contact/
+├── en/                      mesma estrutura, em inglês
+├── css/styles.css           todo o estilo do site (cores, tipografia, layout responsivo)
+├── js/navigation.js         só o menu mobile (abrir/fechar)
+├── assets/profile-placeholder.jpg   foto de perfil usada na Landing Page
+├── mockups/                 capturas de referência (desktop 1440×900, mobile 390×844)
+└── .nojekyll                impede o GitHub Pages de processar o site com Jekyll
 ```
 
-GitHub Pages should publish from the `main` branch and repository root.
+Cada página é um arquivo HTML puro — sem dependências de build, Node.js ou framework.
 
-## Local preview
+## Publicar no GitHub Pages (ozsp12/ozsp12.github.io)
 
-```bash
-python -m http.server 8000
-```
+1. Copie todo o conteúdo desta pasta para a raiz do repositório `ozsp12/ozsp12.github.io` (substituindo o que já existir lá).
+2. Commit e push na branch usada pelo Pages (normalmente `main`).
+3. Em Settings → Pages, confirme fonte = essa branch, pasta raiz (`/`).
+4. Acesse `https://ozsp12.github.io/` — o redirecionamento leva a `/pt/` (ou `/en/`, conforme o idioma do navegador).
 
-Open `http://localhost:8000/`.
+## Como editar
 
-## Notes
+- **Textos/bios**: cada função `homeBody`, `aboutBody`, `teachingBody` etc. já foi convertida em HTML puro dentro de cada página — edite o texto diretamente no `.html` correspondente (PT e EN são arquivos separados, então edite os dois quando alterar conteúdo).
+- **Foto**: troque `assets/profile-placeholder.jpg` por outra imagem com o mesmo nome (ou atualize o `src` em `pt/index.html` e `en/index.html`).
+- **Cores/fontes**: tudo centralizado em `css/styles.css`, no bloco `:root` (`--bg`, `--text`, `--accent`, `--serif`, `--sans`). Trocar a cor de destaque ali atualiza links, navegação ativa e a linha vertical da página de contato em todas as páginas.
+- **Navegação**: os 7 itens (Landing Page, About, Teaching, Research, Publications, Blog, Contact) e os links acadêmicos (Lattes, ORCID, GitHub etc.) estão repetidos em cada página — para adicionar/remover um item, replique a mudança em todos os arquivos `.html`.
 
-- The public root `/` is the Portuguese homepage.
-- The English homepage is `/en/`.
-- `/pt/` redirects to `/`.
-- Publication records reproduce the supplied standalone content and were not independently re-verified during this build.
+## Decisões de design
+
+- Paleta restrita: fundo marfim muito claro, texto grafite, um único destaque em azul-petróleo.
+- Serifada (Source Serif 4) para nome/títulos + sem serifa (Public Sans) para navegação/corpo, com fallback de sistema caso as fontes do Google não carreguem.
+- Landing Page minimalista: só cabeçalho, foto, nome, subtítulo, bio, links acadêmicos e rodapé — sem estatísticas, carrosséis ou CTAs comerciais.
+- Menu mobile via `js/navigation.js` (poucas linhas, sem dependência).
+- Rotas reais `/pt/...` e `/en/...` (arquivos físicos), com `hreflang`, canonical e Open Graph por página, e dados estruturados `Person` (JSON-LD) na Landing Page de cada idioma.
+- Conteúdo de Teaching/Research usa descrições reais fornecidas; a listagem do Blog é claramente marcada como `[Placeholder]` — nenhuma informação foi inventada.
+- Página de Contato mostra apenas o e-mail institucional (`olsp@if.ufrj.br`) e o endereço institucional — sem telefone, formulário ou segundo e-mail.
+
+## Mockups
+
+`mockups/landing-desktop.png` (1440×900) e `mockups/landing-mobile.png` (390×844) — capturas de referência da Landing Page.
