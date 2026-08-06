@@ -1,5 +1,4 @@
-# Dr. Osvaldo L. Santos-Pereira - Personal Academic Site
-
+# ozsp12.github.io
 
 Site pessoal e acadêmico de Dr. Osvaldo L. Santos-Pereira — HTML/CSS estático, sem build, sem frameworks.
 
