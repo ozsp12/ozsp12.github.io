@@ -1,0 +1,111 @@
+/* PhysLab: compact project collection. */
+.physlab-list {
+  list-style: none;
+  margin: 30px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--border);
+}
+
+.physlab-project {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.physlab-thumb-link {
+  display: block;
+  border-radius: 4px;
+  overflow: hidden;
+  outline-offset: 3px;
+}
+
+.physlab-thumb {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.physlab-project-title {
+  margin: 0 0 7px;
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.physlab-project-title a {
+  color: var(--text);
+  border-bottom: 1px solid transparent;
+}
+
+.physlab-project-title a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent-soft);
+  text-decoration: none;
+}
+
+.physlab-project-desc {
+  margin: 0 0 10px;
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text);
+  text-align: justify;
+}
+
+.physlab-project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 18px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.physlab-project-links a {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: var(--text-muted);
+  border-bottom: 1px solid transparent;
+}
+
+.physlab-project-links a:hover,
+.physlab-project-links a:focus-visible {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  text-decoration: none;
+}
+
+.physlab-thumb-link:focus-visible,
+.physlab-project-title a:focus-visible,
+.physlab-project-links a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .physlab-project {
+    grid-template-columns: 145px minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .physlab-project {
+    grid-template-columns: 1fr;
+  }
+
+  .physlab-thumb-link {
+    width: min(210px, 100%);
+  }
+
+  .physlab-project-desc {
+    text-align: left;
+  }
+}

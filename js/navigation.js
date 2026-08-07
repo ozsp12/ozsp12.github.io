@@ -1,9 +1,37 @@
 document.addEventListener('DOMContentLoaded', function () {
+  var isPortuguese = (document.documentElement.lang || '').toLowerCase().indexOf('pt') === 0;
+  var physLabHref = isPortuguese ? '/pt/physlab/' : '/en/physlab/';
+
+  function addPhysLabLink(nav) {
+    if (!nav || nav.querySelector('a[href="' + physLabHref + '"]')) return;
+
+    var link = document.createElement('a');
+    link.className = 'nav-link';
+    link.href = physLabHref;
+    link.textContent = 'PhysLab';
+
+    if (window.location.pathname.indexOf('/physlab/') !== -1) {
+      link.classList.add('active');
+      link.setAttribute('aria-current', 'page');
+    }
+
+    var codeLink = Array.prototype.find.call(nav.querySelectorAll('.nav-link'), function (item) {
+      return (item.getAttribute('href') || '').indexOf('/repos/') !== -1;
+    });
+    var contactLink = Array.prototype.find.call(nav.querySelectorAll('.nav-link'), function (item) {
+      return (item.getAttribute('href') || '').indexOf('/contact/') !== -1;
+    });
+
+    nav.insertBefore(link, codeLink || contactLink || null);
+  }
+
+  addPhysLabLink(document.querySelector('.site-nav'));
+  addPhysLabLink(document.querySelector('.mobile-nav-panel'));
+
   var toggle = document.querySelector('[data-menu-toggle]');
   var panel = document.querySelector('[data-mobile-nav]');
   if (!toggle || !panel) return;
 
-  var isPortuguese = (document.documentElement.lang || '').toLowerCase().indexOf('pt') === 0;
   var openLabel = toggle.getAttribute('aria-label') || (isPortuguese ? 'Abrir menu' : 'Open menu');
   var closeLabel = isPortuguese ? 'Fechar menu' : 'Close menu';
 
