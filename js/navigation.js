@@ -1,9 +1,17 @@
 document.addEventListener('DOMContentLoaded', function () {
+  var isPortuguese = (document.documentElement.lang || '').toLowerCase().indexOf('pt') === 0;
+
+  document.querySelectorAll('.site-nav .nav-link, .mobile-nav-panel .nav-link').forEach(function (link) {
+    var href = link.getAttribute('href') || '';
+    if (href.indexOf('/teaching/') !== -1) link.textContent = 'Notes';
+    if (href.indexOf('/publications/') !== -1) link.textContent = 'Papers';
+    if (href.indexOf('/repos/') !== -1) link.textContent = isPortuguese ? 'Código' : 'Code';
+  });
+
   var toggle = document.querySelector('[data-menu-toggle]');
   var panel = document.querySelector('[data-mobile-nav]');
   if (!toggle || !panel) return;
 
-  var isPortuguese = (document.documentElement.lang || '').toLowerCase().indexOf('pt') === 0;
   var openLabel = toggle.getAttribute('aria-label') || (isPortuguese ? 'Abrir menu' : 'Open menu');
   var closeLabel = isPortuguese ? 'Fechar menu' : 'Close menu';
 
