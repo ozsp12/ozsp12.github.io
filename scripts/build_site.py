@@ -14,6 +14,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES = ROOT / "templates"
 PAGES = TEMPLATES / "pages"
+ERROR_SOURCE = TEMPLATES / "404.html"
+ERROR_OUTPUT = ROOT / "404.html"
 
 PAGE_KEYS = ("home", "about", "teaching", "research", "publications", "physlab", "repos", "contact")
 PAGE_PATHS = {
@@ -229,6 +231,13 @@ def build(check: bool = False) -> int:
                     mismatches.append(output.relative_to(ROOT).as_posix())
             elif write_if_changed(output, generated):
                 changed += 1
+
+    generated_404 = read(ERROR_SOURCE)
+    if check:
+        if not ERROR_OUTPUT.exists() or read(ERROR_OUTPUT) != generated_404:
+            mismatches.append(ERROR_OUTPUT.relative_to(ROOT).as_posix())
+    elif write_if_changed(ERROR_OUTPUT, generated_404):
+        changed += 1
 
     if check:
         if mismatches:
