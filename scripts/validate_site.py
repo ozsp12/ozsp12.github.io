@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 ESSENTIAL_FILES = [
     "index.html",
+    "404.html",
     "pt/index.html",
     "en/index.html",
     "pt/about/index.html",
@@ -161,7 +162,7 @@ class Validation:
 
     def parse_html(self) -> None:
         html_files = sorted(
-            {ROOT / "index.html"}
+            {ROOT / "index.html", ROOT / "404.html"}
             | set((ROOT / "pt").rglob("*.html"))
             | set((ROOT / "en").rglob("*.html"))
         )
@@ -175,7 +176,7 @@ class Validation:
             try:
                 parser.feed(text)
                 parser.close()
-            except Exception as exc:  # HTMLParser errors should still be reported clearly.
+            except Exception as exc:
                 self.fail(f"{relative}: parser error: {exc}")
                 continue
             parser.finish()
@@ -193,6 +194,13 @@ class Validation:
         for path, parser in self.parsers.items():
             relative = path.relative_to(ROOT)
             rel_posix = relative.as_posix()
+
+            if rel_posix == "404.html":
+                if parser.html_lang != "und":
+                    self.fail("404.html: neutral error page must use lang=\"und\"")
+                if parser.canonical:
+                    self.fail(f"404.html: must not define canonical; found {parser.canonical!r}")
+                continue
 
             if rel_posix == "index.html":
                 if parser.html_lang != "und":
@@ -241,7 +249,7 @@ class Validation:
     @staticmethod
     def page_suffix(relative: Path, language: str) -> str:
         parts = relative.parts
-        inner = parts[1:-1]  # remove language and index.html
+        inner = parts[1:-1]
         if not inner:
             return "/"
         return "/" + "/".join(inner) + "/"
@@ -312,6 +320,35 @@ class Validation:
         inner = relative.parts[1:-1]
         suffix = "" if not inner else "/".join(inner) + "/"
         return f"/{language}/{suffix}"
+
+    def check_404(self) -> None:
+        path = ROOT / "404.html"
+        parser = self.parsers.get(path)
+        if parser is None:
+            return
+
+        hrefs = {anchor.get("href") for anchor in parser.anchors}
+        for required in ("/pt/", "/en/"):
+            if required not in hrefs:
+                self.fail(f"404.html: missing fallback link to {required}")
+
+        css_refs = {
+            raw_ref for tag, attr, raw_ref in parser.references
+            if tag == "link" and attr == "href"
+        }
+        if "/css/styles.css" not in css_refs:
+            self.fail("404.html: must reference /css/styles.css")
+
+        if "script" in parser.tags:
+            self.fail("404.html: must not depend on JavaScript")
+
+        text = path.read_text(encoding="utf-8")
+        if re.search(r'<meta[^>]+http-equiv=["\']?refresh', text, flags=re.IGNORECASE):
+            self.fail("404.html: automatic redirect via meta refresh is forbidden")
+        if re.search(r'window\.location|location\.replace|location\.href', text, flags=re.IGNORECASE):
+            self.fail("404.html: automatic JavaScript redirect is forbidden")
+        if not re.search(r'<meta[^>]+content=["\'][^"\']*noindex[^"\']*["\'][^>]+name=["\']robots["\']|<meta[^>]+name=["\']robots["\'][^>]+content=["\'][^"\']*noindex', text, flags=re.IGNORECASE):
+            self.fail("404.html: robots meta must include noindex")
 
     def check_internal_references(self) -> None:
         for source, parser in self.parsers.items():
@@ -390,6 +427,7 @@ class Validation:
         self.check_languages_and_seo()
         self.check_bilingual_symmetry()
         self.check_navigation()
+        self.check_404()
         self.check_internal_references()
         self.check_css_and_javascript_guards()
 
@@ -401,7 +439,7 @@ class Validation:
 
         print(
             f"Validation passed: {len(self.parsers)} HTML files checked; "
-            "essential files, internal links, bilingual structure, navigation, CSS, and JS guards are valid."
+            "essential files, internal links, bilingual structure, navigation, 404, CSS, and JS guards are valid."
         )
         return 0
 
