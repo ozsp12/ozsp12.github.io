@@ -21,5 +21,11 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Check generated HTML is in sync
+        run: python scripts/build_site.py --check
+
+      - name: Regenerate static site
+        run: python scripts/build_site.py
+
       - name: Validate static site
         run: python scripts/validate_site.py
