@@ -1,21 +1,26 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="und">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="refresh" content="0; url=/pt/" />
-  <title>Dr. Osvaldo L. Santos-Pereira — Academic Website</title>
-  <meta name="description" content="Academic website of Dr. Osvaldo L. Santos-Pereira. Select the Portuguese or English version according to your browser language." />
+  <title>Dr. Osvaldo L. Santos-Pereira — Language Selection / Seleção de idioma</title>
+  <meta name="description" content="Language selection page for the academic website of Dr. Osvaldo L. Santos-Pereira. Choose Portuguese or English according to your browser language or manually." />
   <link rel="canonical" href="https://ozsp12.github.io/" />
   <link rel="alternate" hreflang="pt" href="https://ozsp12.github.io/pt/" />
   <link rel="alternate" hreflang="en" href="https://ozsp12.github.io/en/" />
   <link rel="alternate" hreflang="x-default" href="https://ozsp12.github.io/" />
+</head>
+<body>
+  <p>
+    <span lang="pt">Selecione o idioma:</span>
+    <a href="/pt/" hreflang="pt" lang="pt">Português</a>
+    ·
+    <span lang="en">Select language:</span>
+    <a href="/en/" hreflang="en" lang="en">English</a>
+  </p>
   <script>
     var lang = (navigator.language || 'pt').toLowerCase().indexOf('en') === 0 ? 'en' : 'pt';
     window.location.replace('/' + lang + '/');
   </script>
-</head>
-<body>
-  <p>Redirecting… / Redirecionando… <a href="/pt/" hreflang="pt">PT</a> · <a href="/en/" hreflang="en">EN</a></p>
 </body>
 </html>
