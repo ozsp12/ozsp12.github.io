@@ -27,5 +27,11 @@ jobs:
       - name: Regenerate static site
         run: python scripts/build_site.py
 
+      - name: Confirm build is idempotent
+        run: |
+          git diff --exit-code
+          python scripts/build_site.py
+          git diff --exit-code
+
       - name: Validate static site
         run: python scripts/validate_site.py
