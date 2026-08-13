@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from html.parser import HTMLParser
@@ -30,10 +31,16 @@ ESSENTIAL_FILES = [
     "en/repos/index.html",
     "pt/contact/index.html",
     "en/contact/index.html",
+    "en/lstm_ftw/index.html",
+    "en/lstm_ftw/dashboard-data.json",
     "css/styles.css",
     "css/physlab.css",
+    "css/lstm-dashboard.css",
     "js/navigation.js",
+    "js/lstm-dashboard.js",
 ]
+
+STANDALONE_EN_PAGES = {"lstm_ftw/index.html"}
 
 VOID_ELEMENTS = {
     "area", "base", "br", "col", "embed", "hr", "img", "input",
@@ -226,11 +233,18 @@ class Validation:
                     self.fail(f"{relative}: English page must declare lang=en")
                 suffix = self.page_suffix(relative, "en")
                 expected_canonical = f"https://ozsp12.github.io/en{suffix}"
-                expected_alternates = {
-                    "pt": f"https://ozsp12.github.io/pt{suffix}",
-                    "en": f"https://ozsp12.github.io/en{suffix}",
-                    "x-default": "https://ozsp12.github.io/",
-                }
+                standalone = relative.relative_to("en").as_posix() in STANDALONE_EN_PAGES
+                if standalone:
+                    expected_alternates = {
+                        "en": f"https://ozsp12.github.io/en{suffix}",
+                        "x-default": "https://ozsp12.github.io/",
+                    }
+                else:
+                    expected_alternates = {
+                        "pt": f"https://ozsp12.github.io/pt{suffix}",
+                        "en": f"https://ozsp12.github.io/en{suffix}",
+                        "x-default": "https://ozsp12.github.io/",
+                    }
             else:
                 continue
 
@@ -263,6 +277,7 @@ class Validation:
             path.relative_to(ROOT / "en").as_posix()
             for path in (ROOT / "en").rglob("index.html")
         }
+        en_pages -= STANDALONE_EN_PAGES
         if pt_pages != en_pages:
             missing_en = sorted(pt_pages - en_pages)
             missing_pt = sorted(en_pages - pt_pages)
@@ -301,7 +316,10 @@ class Validation:
                 if not is_physlab and ("active" in classes or current):
                     self.fail(f"{relative}: PhysLab link must not be active/current off PhysLab page")
 
-            expected_current = self.expected_nav_href(relative, language)
+            if rel_posix == "en/lstm_ftw/index.html":
+                expected_current = "/en/repos/"
+            else:
+                expected_current = self.expected_nav_href(relative, language)
             current_nav_links = [
                 a for a in nav_links if a.get("aria-current") == "page"
             ]
@@ -404,12 +422,13 @@ class Validation:
                 )
 
     def check_css_and_javascript_guards(self) -> None:
-        css_path = ROOT / "css/styles.css"
-        if css_path.is_file():
+        for css_path in (ROOT / "css/styles.css", ROOT / "css/lstm-dashboard.css"):
+            if not css_path.is_file():
+                continue
             css = css_path.read_text(encoding="utf-8")
             stripped = re.sub(r"/\*.*?\*/", "", css, flags=re.DOTALL)
             if stripped.count("{") != stripped.count("}"):
-                self.fail("css/styles.css: unbalanced braces")
+                self.fail(f"{css_path.relative_to(ROOT)}: unbalanced braces")
 
         js_path = ROOT / "js/navigation.js"
         if js_path.is_file():
@@ -421,6 +440,44 @@ class Validation:
                         f"js/navigation.js: permanent navigation generation returned ({token})"
                     )
 
+    def check_lstm_dashboard_data(self) -> None:
+        path = ROOT / "en/lstm_ftw/dashboard-data.json"
+        if not path.is_file():
+            return
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            self.fail(f"en/lstm_ftw/dashboard-data.json: invalid JSON: {exc}")
+            return
+
+        reviews = data.get("reviews")
+        kpis = data.get("kpis", {})
+        if not isinstance(reviews, list) or not reviews:
+            self.fail("en/lstm_ftw/dashboard-data.json: reviews must be a non-empty list")
+            return
+        ids = [review.get("id") for review in reviews]
+        if len(ids) != len(set(ids)):
+            self.fail("en/lstm_ftw/dashboard-data.json: review IDs must be unique")
+        if kpis.get("test_reviews") != len(reviews):
+            self.fail("en/lstm_ftw/dashboard-data.json: KPI review count does not match rows")
+        required = {
+            "id", "text", "expected_sentiment", "predicted_sentiment",
+            "expected_topic", "predicted_topic", "sentiment_confidence",
+            "topic_confidence", "both_correct",
+        }
+        for index, review in enumerate(reviews):
+            missing = required - set(review)
+            if missing:
+                self.fail(
+                    "en/lstm_ftw/dashboard-data.json: "
+                    f"review {index} missing fields: {', '.join(sorted(missing))}"
+                )
+                break
+
+        joint_correct = sum(bool(review.get("both_correct")) for review in reviews)
+        if kpis.get("joint_correct") != joint_correct:
+            self.fail("en/lstm_ftw/dashboard-data.json: joint-correct KPI does not match rows")
+
     def run(self) -> int:
         self.check_essential_files()
         self.parse_html()
@@ -430,6 +487,7 @@ class Validation:
         self.check_404()
         self.check_internal_references()
         self.check_css_and_javascript_guards()
+        self.check_lstm_dashboard_data()
 
         if self.errors:
             print(f"Validation failed with {len(self.errors)} error(s):", file=sys.stderr)
