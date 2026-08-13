@@ -1,7 +1,10 @@
 (function () {
   "use strict";
 
-  const DATA_URL = "/en/lstm_ftw/dashboard-data.json";
+  const OUTPUT_ROOT = "https://raw.githubusercontent.com/ozsp12/lstm_for_the_win/main/data/output";
+  const OUTPUT_BROWSER_ROOT = "https://github.com/ozsp12/lstm_for_the_win/tree/main/data/output";
+  const SENTIMENT_ORDER = ["negative", "neutral", "positive"];
+  const TOPIC_ORDER = ["refrigerator", "smartphone", "television", "washing_machine"];
   const PAGE_SIZE = 20;
   const state = { data: null, filtered: [], page: 1 };
 
@@ -29,6 +32,262 @@
     }).format(date);
   }
 
+  function assert(condition, message) {
+    if (!condition) throw new Error(message);
+  }
+
+  async function fetchText(url) {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Live data request failed (${response.status}): ${url}`);
+    return response.text();
+  }
+
+  async function fetchJson(url) {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Live data request failed (${response.status}): ${url}`);
+    return response.json();
+  }
+
+  function parseCsv(text) {
+    const records = [];
+    let record = [];
+    let field = "";
+    let quoted = false;
+
+    for (let index = 0; index < text.length; index += 1) {
+      const character = text[index];
+      if (quoted) {
+        if (character === '"' && text[index + 1] === '"') {
+          field += '"';
+          index += 1;
+        } else if (character === '"') {
+          quoted = false;
+        } else {
+          field += character;
+        }
+      } else if (character === '"') {
+        quoted = true;
+      } else if (character === ",") {
+        record.push(field);
+        field = "";
+      } else if (character === "\n") {
+        record.push(field.replace(/\r$/, ""));
+        if (record.some((value) => value !== "")) records.push(record);
+        record = [];
+        field = "";
+      } else {
+        field += character;
+      }
+    }
+
+    assert(!quoted, "CSV contains an unterminated quoted field.");
+    if (field || record.length) {
+      record.push(field.replace(/\r$/, ""));
+      if (record.some((value) => value !== "")) records.push(record);
+    }
+    assert(records.length > 1, "CSV contains no data rows.");
+
+    const headers = records[0];
+    assert(headers.length === new Set(headers).size, "CSV contains duplicate column names.");
+    return records.slice(1).map((values, rowIndex) => {
+      assert(values.length === headers.length, `CSV row ${rowIndex + 2} has an invalid column count.`);
+      return Object.fromEntries(headers.map((header, columnIndex) => [header, values[columnIndex]]));
+    });
+  }
+
+  function requireFields(rows, required, sourceName) {
+    assert(rows.length > 0, `${sourceName} contains no rows.`);
+    const available = new Set(Object.keys(rows[0]));
+    const missing = required.filter((field) => !available.has(field));
+    assert(missing.length === 0, `${sourceName} is missing columns: ${missing.join(", ")}.`);
+  }
+
+  function ratio(correct, total) {
+    return total ? correct / total : 0;
+  }
+
+  function countBy(rows, field, labels) {
+    const result = Object.fromEntries(labels.map((name) => [name, 0]));
+    rows.forEach((row) => {
+      assert(Object.hasOwn(result, row[field]), `Unexpected ${field} label: ${row[field]}.`);
+      result[row[field]] += 1;
+    });
+    return result;
+  }
+
+  function taskSummary(rows, labels) {
+    assert(rows.length > 0, "Evaluation task contains no rows.");
+    const correct = rows.filter((row) => row.correct).length;
+    const classAccuracy = {};
+    labels.forEach((name) => {
+      const classRows = rows.filter((row) => row.expected === name);
+      assert(classRows.length > 0, `Expected class ${name} is missing.`);
+      classAccuracy[name] = ratio(classRows.filter((row) => row.correct).length, classRows.length);
+    });
+
+    const matrix = Object.fromEntries(
+      labels.map((expected) => [expected, Object.fromEntries(labels.map((predicted) => [predicted, 0]))])
+    );
+    rows.forEach((row) => {
+      assert(Object.hasOwn(matrix, row.expected), `Unexpected expected label: ${row.expected}.`);
+      assert(Object.hasOwn(matrix[row.expected], row.predicted), `Unexpected predicted label: ${row.predicted}.`);
+      matrix[row.expected][row.predicted] += 1;
+    });
+
+    const averageConfidence = rows.reduce((sum, row) => sum + row.confidence, 0) / rows.length;
+    return {
+      accuracy: ratio(correct, rows.length),
+      correct,
+      errors: rows.length - correct,
+      average_confidence: averageConfidence,
+      expected_distribution: countBy(rows, "expected", labels),
+      predicted_distribution: countBy(rows, "predicted", labels),
+      class_accuracy: classAccuracy,
+      confidence_bands: {
+        high_0_80_to_1_00: rows.filter((row) => row.confidence >= 0.8).length,
+        medium_0_60_to_0_79: rows.filter((row) => row.confidence >= 0.6 && row.confidence < 0.8).length,
+        low_below_0_60: rows.filter((row) => row.confidence < 0.6).length,
+      },
+      confusion: { labels, matrix },
+    };
+  }
+
+  function buildDashboardData(manifest, predictionRows, evaluationRows, urls) {
+    const predictionFields = [
+      "ID", "text", "expected_sentiment", "expected_topic", "predicted_sentiment",
+      "predicted_topic", "type", "input_timestamp", "model_timestamp",
+    ];
+    const evaluationFields = [
+      "ID", "task", "expected", "predicted", "confidence", "correct", "type",
+      "input_timestamp", "model_timestamp",
+    ];
+    requireFields(predictionRows, predictionFields, "predictions.csv");
+    requireFields(evaluationRows, evaluationFields, "evaluation_predictions.csv");
+    assert(manifest.status === "complete", "The latest run is not complete.");
+    assert(manifest.run_id === urls.runId, "latest.json and run_manifest.json disagree on the run ID.");
+    assert(predictionRows.every((row) => row.type === "test"), "predictions.csv contains non-test rows.");
+    assert(evaluationRows.every((row) => row.type === "test"), "evaluation_predictions.csv contains non-test rows.");
+    assert(
+      predictionRows.every((row) => row.model_timestamp === manifest.model_timestamp),
+      "predictions.csv and run_manifest.json disagree on the model timestamp."
+    );
+    assert(
+      evaluationRows.every((row) => row.model_timestamp === manifest.model_timestamp),
+      "evaluation_predictions.csv and run_manifest.json disagree on the model timestamp."
+    );
+
+    const ids = predictionRows.map((row) => Number(row.ID));
+    assert(ids.every(Number.isInteger), "predictions.csv contains an invalid ID.");
+    assert(ids.length === new Set(ids).size, "predictions.csv contains duplicate IDs.");
+
+    const evaluations = new Map();
+    const taskRows = { sentiment: [], topic: [] };
+    evaluationRows.forEach((row) => {
+      assert(row.task === "sentiment" || row.task === "topic", `Unexpected task: ${row.task}.`);
+      assert(["true", "false"].includes(row.correct.toLowerCase()), `Invalid correct flag for ID ${row.ID}.`);
+      const confidence = Number(row.confidence);
+      const evaluationId = Number(row.ID);
+      assert(Number.isInteger(evaluationId), `Invalid evaluation ID: ${row.ID}.`);
+      assert(Number.isFinite(confidence) && confidence >= 0 && confidence <= 1, `Invalid confidence for ID ${row.ID}.`);
+      const item = {
+        id: evaluationId,
+        task: row.task,
+        expected: row.expected,
+        predicted: row.predicted,
+        confidence,
+        correct: row.correct.toLowerCase() === "true",
+      };
+      const key = `${item.id}:${item.task}`;
+      assert(!evaluations.has(key), `Duplicate ${item.task} evaluation for ID ${item.id}.`);
+      evaluations.set(key, item);
+      taskRows[item.task].push(item);
+    });
+    assert(evaluationRows.length === predictionRows.length * 2, "Each prediction must have two evaluation rows.");
+
+    const reviews = predictionRows.map((row) => {
+      const id = Number(row.ID);
+      const sentiment = evaluations.get(`${id}:sentiment`);
+      const topic = evaluations.get(`${id}:topic`);
+      assert(sentiment && topic, `Missing evaluation data for ID ${id}.`);
+      assert(sentiment.expected === row.expected_sentiment, `Sentiment expected-label mismatch for ID ${id}.`);
+      assert(sentiment.predicted === row.predicted_sentiment, `Sentiment prediction mismatch for ID ${id}.`);
+      assert(topic.expected === row.expected_topic, `Topic expected-label mismatch for ID ${id}.`);
+      assert(topic.predicted === row.predicted_topic, `Topic prediction mismatch for ID ${id}.`);
+      return {
+        id,
+        text: row.text,
+        expected_sentiment: row.expected_sentiment,
+        predicted_sentiment: row.predicted_sentiment,
+        sentiment_confidence: sentiment.confidence,
+        sentiment_correct: sentiment.correct,
+        expected_topic: row.expected_topic,
+        predicted_topic: row.predicted_topic,
+        topic_confidence: topic.confidence,
+        topic_correct: topic.correct,
+        both_correct: sentiment.correct && topic.correct,
+      };
+    });
+
+    const sentiment = taskSummary(taskRows.sentiment, SENTIMENT_ORDER);
+    const topic = taskSummary(taskRows.topic, TOPIC_ORDER);
+    const jointCorrect = reviews.filter((review) => review.both_correct).length;
+    return {
+      metadata: {
+        ...manifest,
+        data_scope: "Synthetic product reviews; test partition only",
+        loaded_at: new Date().toISOString(),
+        source_urls: urls,
+      },
+      kpis: {
+        test_reviews: reviews.length,
+        sentiment_accuracy: sentiment.accuracy,
+        topic_accuracy: topic.accuracy,
+        joint_accuracy: ratio(jointCorrect, reviews.length),
+        joint_correct: jointCorrect,
+        joint_errors: reviews.length - jointCorrect,
+      },
+      sentiment,
+      topic,
+      reviews,
+    };
+  }
+
+  async function loadLiveDataAttempt() {
+    const cacheKey = Date.now();
+    const latest = await fetchJson(`${OUTPUT_ROOT}/latest.json?live=${cacheKey}`);
+    assert(typeof latest.run_id === "string" && /^[A-Za-z0-9._-]+$/.test(latest.run_id), "latest.json contains an invalid run ID.");
+    const runId = latest.run_id;
+    const runRoot = `${OUTPUT_ROOT}/${encodeURIComponent(runId)}`;
+    const urls = {
+      runId,
+      predictions: `${runRoot}/predictions.csv?live=${cacheKey}`,
+      evaluations: `${runRoot}/evaluation_predictions.csv?live=${cacheKey}`,
+      manifest: `${runRoot}/run_manifest.json?live=${cacheKey}`,
+      browser: `${OUTPUT_BROWSER_ROOT}/${encodeURIComponent(runId)}`,
+    };
+    const [manifest, predictionsText, evaluationsText] = await Promise.all([
+      fetchJson(urls.manifest),
+      fetchText(urls.predictions),
+      fetchText(urls.evaluations),
+    ]);
+    return buildDashboardData(manifest, parseCsv(predictionsText), parseCsv(evaluationsText), urls);
+  }
+
+  async function loadLiveData() {
+    let lastError;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        return await loadLiveDataAttempt();
+      } catch (error) {
+        lastError = error;
+        if (attempt < 2) {
+          await new Promise((resolve) => window.setTimeout(resolve, 750 * (attempt + 1)));
+        }
+      }
+    }
+    throw lastError;
+  }
+
   function renderMetadata(data) {
     const { metadata, kpis, sentiment, topic } = data;
     setText("run-id", metadata.run_id);
@@ -40,9 +299,51 @@
     setText("kpi-sentiment-detail", `${number(sentiment.correct)} of ${number(kpis.test_reviews)} correct`);
     setText("kpi-topic-detail", `${number(topic.correct)} of ${number(kpis.test_reviews)} correct`);
     setText("kpi-joint-detail", `${number(kpis.joint_correct)} of ${number(kpis.test_reviews)} reviews`);
+    setText("data-review-count", number(kpis.test_reviews));
+    setText(
+      "source-freshness",
+      `Live from ${metadata.run_id} · model executed ${formatTimestamp(metadata.model_timestamp)} · loaded ${formatTimestamp(metadata.loaded_at)}`
+    );
+    const status = byId("live-status");
+    status.className = "status-complete";
+    status.innerHTML = '<i aria-hidden="true"></i> Live';
+    byId("download-results").href = metadata.source_urls.predictions;
+    byId("source-run-link").href = metadata.source_urls.browser;
     setText(
       "method-meta",
-      `Pipeline ${metadata.pipeline_version} · Seed ${metadata.seed} · ${metadata.epochs} epochs · TensorFlow ${metadata.tensorflow_version}`
+      `Pipeline ${metadata.pipeline_version} · Seed ${metadata.parameters.seed} · ${metadata.parameters.epochs} epochs · TensorFlow ${metadata.tensorflow_version}`
+    );
+  }
+
+  function renderFinding(data) {
+    const topicPerfect = data.topic.errors === 0;
+    const confidenceGap = data.sentiment.average_confidence - data.sentiment.accuracy;
+    const errorPairs = [];
+    data.sentiment.confusion.labels.forEach((expected) => {
+      data.sentiment.confusion.labels.forEach((predicted) => {
+        if (expected !== predicted) {
+          errorPairs.push({ expected, predicted, count: data.sentiment.confusion.matrix[expected][predicted] });
+        }
+      });
+    });
+    errorPairs.sort((left, right) => right.count - left.count);
+    const largestError = errorPairs[0];
+    setText(
+      "finding-title",
+      topicPerfect ? "Topic separation is strong; sentiment needs calibration." : "Both classifiers have measurable improvement opportunities."
+    );
+    const topicSentence = topicPerfect
+      ? "The topic model classified every review correctly"
+      : `The topic model reached ${percent(data.topic.accuracy)} accuracy`;
+    const calibrationSentence = confidenceGap >= 0.1
+      ? `Average sentiment confidence was ${percent(data.sentiment.average_confidence)}, which is high relative to its ${percent(data.sentiment.accuracy)} accuracy.`
+      : `Average sentiment confidence was ${percent(data.sentiment.average_confidence)} against ${percent(data.sentiment.accuracy)} accuracy.`;
+    const errorSentence = largestError && largestError.count
+      ? `The most common sentiment error was ${label(largestError.expected)} predicted as ${label(largestError.predicted)} (${number(largestError.count)} reviews).`
+      : "No sentiment errors were observed.";
+    setText(
+      "finding-body",
+      `${topicSentence} in run ${data.metadata.run_id}. ${calibrationSentence} ${errorSentence}`
     );
   }
 
@@ -317,6 +618,7 @@
     state.data = data;
     state.filtered = data.reviews.slice();
     renderMetadata(data);
+    renderFinding(data);
     renderModelAccuracy(data);
     renderSentimentClasses(data);
     renderMatrix(data);
@@ -331,7 +633,7 @@
   function showError(error) {
     const message = document.createElement("p");
     message.className = "dashboard-load-error";
-    message.textContent = "The dashboard snapshot could not be loaded. Please refresh the page or download the data file directly.";
+    message.textContent = "Live model results could not be loaded or did not pass validation. No cached result is being shown. Please refresh the page or open the source files.";
     const hero = document.querySelector(".dashboard-hero");
     hero.insertAdjacentElement("afterend", message);
     const tableBody = byId("review-table-body");
@@ -344,14 +646,15 @@
       tr.appendChild(td);
       tableBody.replaceChildren(tr);
     }
+    const status = byId("live-status");
+    if (status) {
+      status.className = "status-error";
+      status.innerHTML = '<i aria-hidden="true"></i> Data unavailable';
+    }
+    setText("source-freshness", "The live source could not be validated.");
+    document.documentElement.dataset.dashboardError = "true";
     console.error(error);
   }
 
-  fetch(DATA_URL, { cache: "no-store" })
-    .then((response) => {
-      if (!response.ok) throw new Error(`Dashboard data request failed: ${response.status}`);
-      return response.json();
-    })
-    .then(render)
-    .catch(showError);
+  loadLiveData().then(render).catch(showError);
 })();

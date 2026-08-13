@@ -35,3 +35,6 @@ jobs:
 
       - name: Validate static site
         run: python scripts/validate_site.py
+
+      - name: Validate live LSTM dashboard
+        run: node scripts/validate_lstm_dashboard.mjs
