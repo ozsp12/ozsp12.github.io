@@ -75,14 +75,15 @@
 </div>
 <div class="hero-actions">
 <a class="dashboard-button dashboard-button-primary" href="https://github.com/ozsp12/lstm_for_the_win" rel="noopener noreferrer" target="_blank">View source</a>
-<a class="dashboard-button" download href="/en/lstm_ftw/dashboard-data.json">Download snapshot</a>
+<a class="dashboard-button" href="https://github.com/ozsp12/lstm_for_the_win/tree/main/data/output" id="download-results" rel="noopener noreferrer" target="_blank">Open latest CSV</a>
 </div>
 <div class="run-strip" aria-label="Model run metadata">
-<div><span>Run</span><strong id="run-id">local-streamlit-20260813-125951</strong></div>
-<div><span>Model executed</span><strong id="model-time">13 Aug 2026, 15:59 UTC</strong></div>
+<div><span>Run</span><strong id="run-id">Loading latest run…</strong></div>
+<div><span>Model executed</span><strong id="model-time">Loading…</strong></div>
 <div><span>Scope</span><strong>Synthetic · Test only</strong></div>
-<div><span>Status</span><strong class="status-complete"><i aria-hidden="true"></i> Complete</strong></div>
+<div><span>Status</span><strong class="status-loading" id="live-status"><i aria-hidden="true"></i> Loading live data</strong></div>
 </div>
+<p class="live-source-note"><span id="source-freshness">Reading the newest versioned workflow output from GitHub…</span> <a href="https://github.com/ozsp12/lstm_for_the_win/tree/main/data/output" id="source-run-link" rel="noopener noreferrer" target="_blank">View source files</a></p>
 </section>
 
 <section aria-labelledby="overview-heading" class="dashboard-section">
@@ -96,22 +97,22 @@
 <div class="kpi-grid">
 <article class="kpi-card kpi-card-featured">
 <p>Sentiment accuracy</p>
-<strong id="kpi-sentiment">69.0%</strong>
-<span id="kpi-sentiment-detail">345 of 500 correct</span>
+<strong id="kpi-sentiment">—</strong>
+<span id="kpi-sentiment-detail">Waiting for results</span>
 </article>
 <article class="kpi-card">
 <p>Topic accuracy</p>
-<strong id="kpi-topic">100.0%</strong>
-<span id="kpi-topic-detail">500 of 500 correct</span>
+<strong id="kpi-topic">—</strong>
+<span id="kpi-topic-detail">Waiting for results</span>
 </article>
 <article class="kpi-card">
 <p>Both labels correct</p>
-<strong id="kpi-joint">69.0%</strong>
-<span id="kpi-joint-detail">345 of 500 reviews</span>
+<strong id="kpi-joint">—</strong>
+<span id="kpi-joint-detail">Waiting for results</span>
 </article>
 <article class="kpi-card">
 <p>Test reviews</p>
-<strong id="kpi-reviews">500</strong>
+<strong id="kpi-reviews">—</strong>
 <span>Unique test IDs</span>
 </article>
 </div>
@@ -120,8 +121,8 @@
 <div class="finding-mark" aria-hidden="true">!</div>
 <div>
 <p class="finding-label">Decision signal</p>
-<h3>Topic separation is strong; sentiment needs calibration.</h3>
-<p>The topic model classified every review correctly in this synthetic snapshot. Sentiment accuracy reached 69.0%, while average confidence stayed at 99.0%. High confidence on wrong answers indicates overconfidence and makes sentiment calibration the next priority.</p>
+<h3 id="finding-title">Loading the latest model signal…</h3>
+<p id="finding-body">This interpretation will be calculated from the newest CSV committed by the model workflow.</p>
 </div>
 </div>
 </section>
@@ -196,7 +197,7 @@
 <p class="section-kicker">Review explorer</p>
 <h2 id="explorer-heading">Inspect individual predictions</h2>
 </div>
-<p class="section-note" id="review-count">Showing 20 of 500 reviews</p>
+<p class="section-note" id="review-count">Loading reviews…</p>
 </div>
 <div class="filter-bar" role="search">
 <label class="search-field"><span>Search review or ID</span><input id="review-search" placeholder="e.g. door seal or 501" type="search"/></label>
@@ -220,11 +221,11 @@
 <section class="method-note" aria-labelledby="method-heading">
 <div>
 <p class="section-kicker">How to read this dashboard</p>
-<h2 id="method-heading">Snapshot and limitations</h2>
+<h2 id="method-heading">Live data and limitations</h2>
 </div>
 <div class="method-grid">
-<p><strong>Data.</strong> The page uses 500 synthetic product reviews from the test partition. Training rows are excluded.</p>
-<p><strong>Versioning.</strong> Every review has a unique ID. The snapshot records both the input timestamp and the model execution timestamp.</p>
+<p><strong>Data.</strong> The page reads <span id="data-review-count">the latest</span> synthetic product reviews from the versioned test output. Training rows are excluded.</p>
+<p><strong>Versioning.</strong> Every review has a unique ID. On each page load, the dashboard follows <code>latest.json</code> to the newest committed run and reads its input and model timestamps.</p>
 <p><strong>Interpretation.</strong> Perfect topic accuracy on synthetic data is promising but does not establish real-world performance. External review data is the next validation step.</p>
 </div>
 <div class="method-meta" id="method-meta">Pipeline 0.4.0 · Seed 42 · 20 epochs · TensorFlow 2.20.0</div>
@@ -237,6 +238,6 @@
 <p class="footer-tagline">Physics · Mathematics · Artificial Intelligence · Data Science</p>
 </footer>
 <script src="/js/navigation.js"></script>
-<script defer src="/js/lstm-dashboard.js?v=1"></script>
+<script defer src="/js/lstm-dashboard.js?v=2"></script>
 </body>
 </html>
