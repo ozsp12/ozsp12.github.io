@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>LSTM Model Results Dashboard | Dr. Osvaldo L. Santos-Pereira</title>
+<meta content="Interactive dashboard for the LSTM for the Win product-review classification pipeline, covering sentiment and topic model results." name="description"/>
+<link href="https://ozsp12.github.io/en/lstm_ftw/" rel="canonical"/>
+<meta content="website" property="og:type"/>
+<meta content="LSTM Model Results Dashboard" property="og:title"/>
+<meta content="Explore sentiment and topic classification results for synthetic product reviews." property="og:description"/>
+<meta content="https://ozsp12.github.io/en/lstm_ftw/" property="og:url"/>
+<meta content="Dr. Osvaldo L. Santos-Pereira" property="og:site_name"/>
+<meta content="en_US" property="og:locale"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="LSTM Model Results Dashboard" name="twitter:title"/>
+<meta content="Explore sentiment and topic classification results for synthetic product reviews." name="twitter:description"/>
+<link href="https://ozsp12.github.io/en/lstm_ftw/" hreflang="en" rel="alternate"/>
+<link href="https://ozsp12.github.io/" hreflang="x-default" rel="alternate"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&amp;family=Public+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="/css/styles.css" rel="stylesheet"/>
+<link href="/css/lstm-dashboard.css?v=1" rel="stylesheet"/>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header class="site-header">
+<div class="header-inner">
+<a class="wordmark" href="/en/">Dr. Osvaldo L. Santos-Pereira</a>
+<nav aria-label="Primary navigation" class="site-nav">
+<a class="nav-link" href="/en/">Home</a>
+<a class="nav-link" href="/en/about/">About</a>
+<a class="nav-link" href="/en/teaching/">Notes</a>
+<a class="nav-link" href="/en/research/">Research</a>
+<a class="nav-link" href="/en/publications/">Papers</a>
+<a class="nav-link" href="/en/physlab/">PhysLab</a>
+<a aria-current="page" class="nav-link active" href="/en/repos/">Code</a>
+<a class="nav-link" href="/en/contact/">Contact</a>
+<span class="lang-divider"></span>
+<div class="lang-switch">
+<a aria-current="false" class="lang-btn" href="/pt/repos/">PT</a>
+<span class="lang-sep">|</span>
+<a aria-current="true" class="lang-btn active" href="/en/lstm_ftw/">EN</a>
+</div>
+</nav>
+<button aria-controls="mobile-navigation" aria-expanded="false" aria-label="Open menu" class="hamburger" data-menu-toggle="" type="button">
+<span></span><span></span><span></span>
+</button>
+</div>
+<nav aria-hidden="true" aria-label="Primary navigation" class="mobile-nav-panel" data-mobile-nav="" id="mobile-navigation">
+<a class="nav-link" href="/en/">Home</a>
+<a class="nav-link" href="/en/about/">About</a>
+<a class="nav-link" href="/en/teaching/">Notes</a>
+<a class="nav-link" href="/en/research/">Research</a>
+<a class="nav-link" href="/en/publications/">Papers</a>
+<a class="nav-link" href="/en/physlab/">PhysLab</a>
+<a aria-current="page" class="nav-link active" href="/en/repos/">Code</a>
+<a class="nav-link" href="/en/contact/">Contact</a>
+<div class="mobile-lang-row">
+<a class="lang-btn" href="/pt/repos/">PT</a>
+<span class="lang-sep">|</span>
+<a class="lang-btn active" href="/en/lstm_ftw/">EN</a>
+</div>
+</nav>
+</header>
+
+<main class="dashboard-main" id="main-content">
+<div class="dashboard-shell">
+<section class="dashboard-hero" aria-labelledby="dashboard-title">
+<div>
+<p class="dashboard-eyebrow">LSTM for the Win · Model results</p>
+<h1 id="dashboard-title">Product review classification</h1>
+<p class="dashboard-deck">A stakeholder view of how the pipeline classifies sentiment and product topic on the synthetic test set.</p>
+</div>
+<div class="hero-actions">
+<a class="dashboard-button dashboard-button-primary" href="https://github.com/ozsp12/lstm_for_the_win" rel="noopener noreferrer" target="_blank">View source</a>
+<a class="dashboard-button" download href="/en/lstm_ftw/dashboard-data.json">Download snapshot</a>
+</div>
+<div class="run-strip" aria-label="Model run metadata">
+<div><span>Run</span><strong id="run-id">local-streamlit-20260813-125951</strong></div>
+<div><span>Model executed</span><strong id="model-time">13 Aug 2026, 15:59 UTC</strong></div>
+<div><span>Scope</span><strong>Synthetic · Test only</strong></div>
+<div><span>Status</span><strong class="status-complete"><i aria-hidden="true"></i> Complete</strong></div>
+</div>
+</section>
+
+<section aria-labelledby="overview-heading" class="dashboard-section">
+<div class="section-heading">
+<div>
+<p class="section-kicker">Executive summary</p>
+<h2 id="overview-heading">Performance at a glance</h2>
+</div>
+<p class="section-note">Accuracy = correct predictions ÷ test reviews</p>
+</div>
+<div class="kpi-grid">
+<article class="kpi-card kpi-card-featured">
+<p>Sentiment accuracy</p>
+<strong id="kpi-sentiment">69.0%</strong>
+<span id="kpi-sentiment-detail">345 of 500 correct</span>
+</article>
+<article class="kpi-card">
+<p>Topic accuracy</p>
+<strong id="kpi-topic">100.0%</strong>
+<span id="kpi-topic-detail">500 of 500 correct</span>
+</article>
+<article class="kpi-card">
+<p>Both labels correct</p>
+<strong id="kpi-joint">69.0%</strong>
+<span id="kpi-joint-detail">345 of 500 reviews</span>
+</article>
+<article class="kpi-card">
+<p>Test reviews</p>
+<strong id="kpi-reviews">500</strong>
+<span>Unique test IDs</span>
+</article>
+</div>
+
+<div class="finding-card">
+<div class="finding-mark" aria-hidden="true">!</div>
+<div>
+<p class="finding-label">Decision signal</p>
+<h3>Topic separation is strong; sentiment needs calibration.</h3>
+<p>The topic model classified every review correctly in this synthetic snapshot. Sentiment accuracy reached 69.0%, while average confidence stayed at 99.0%. High confidence on wrong answers indicates overconfidence and makes sentiment calibration the next priority.</p>
+</div>
+</div>
+</section>
+
+<section aria-labelledby="performance-heading" class="dashboard-section">
+<div class="section-heading">
+<div>
+<p class="section-kicker">Model diagnostics</p>
+<h2 id="performance-heading">Where the models perform</h2>
+</div>
+</div>
+<div class="dashboard-grid dashboard-grid-2">
+<article class="panel">
+<div class="panel-heading">
+<div><p class="panel-kicker">Accuracy</p><h3>Model comparison</h3></div>
+<span class="panel-meta">Test set</span>
+</div>
+<div class="bar-chart" id="model-accuracy-chart" aria-label="Accuracy by model"></div>
+</article>
+<article class="panel">
+<div class="panel-heading">
+<div><p class="panel-kicker">Recall by expected label</p><h3>Sentiment class performance</h3></div>
+<span class="panel-meta">Higher is better</span>
+</div>
+<div class="bar-chart" id="sentiment-class-chart" aria-label="Sentiment accuracy by expected class"></div>
+</article>
+<article class="panel panel-wide">
+<div class="panel-heading">
+<div><p class="panel-kicker">Error pattern</p><h3>Sentiment confusion matrix</h3></div>
+<span class="panel-meta">Rows: expected · Columns: predicted</span>
+</div>
+<div class="matrix-wrap" id="sentiment-matrix"></div>
+</article>
+<article class="panel panel-wide">
+<div class="panel-heading">
+<div><p class="panel-kicker">Coverage</p><h3>Topic volume and accuracy</h3></div>
+<span class="panel-meta">Expected classes</span>
+</div>
+<div class="topic-chart" id="topic-chart"></div>
+</article>
+</div>
+</section>
+
+<section aria-labelledby="distribution-heading" class="dashboard-section">
+<div class="section-heading">
+<div>
+<p class="section-kicker">Prediction behavior</p>
+<h2 id="distribution-heading">Class balance and confidence</h2>
+</div>
+</div>
+<div class="dashboard-grid dashboard-grid-2">
+<article class="panel">
+<div class="panel-heading">
+<div><p class="panel-kicker">Sentiment counts</p><h3>Expected vs. predicted</h3></div>
+<div class="legend"><span><i class="legend-expected"></i>Expected</span><span><i class="legend-predicted"></i>Predicted</span></div>
+</div>
+<div class="grouped-chart" id="sentiment-distribution-chart"></div>
+</article>
+<article class="panel">
+<div class="panel-heading">
+<div><p class="panel-kicker">Average confidence</p><h3>Certainty vs. accuracy</h3></div>
+</div>
+<div class="confidence-comparison" id="confidence-comparison"></div>
+<p class="panel-footnote">Confidence is the model probability assigned to its selected class. It is not the same as accuracy.</p>
+</article>
+</div>
+</section>
+
+<section aria-labelledby="explorer-heading" class="dashboard-section dashboard-section-last">
+<div class="section-heading explorer-heading">
+<div>
+<p class="section-kicker">Review explorer</p>
+<h2 id="explorer-heading">Inspect individual predictions</h2>
+</div>
+<p class="section-note" id="review-count">Showing 20 of 500 reviews</p>
+</div>
+<div class="filter-bar" role="search">
+<label class="search-field"><span>Search review or ID</span><input id="review-search" placeholder="e.g. door seal or 501" type="search"/></label>
+<label><span>Sentiment</span><select id="sentiment-filter"><option value="all">All sentiments</option><option value="negative">Negative</option><option value="neutral">Neutral</option><option value="positive">Positive</option></select></label>
+<label><span>Topic</span><select id="topic-filter"><option value="all">All topics</option><option value="refrigerator">Refrigerator</option><option value="smartphone">Smartphone</option><option value="television">Television</option><option value="washing_machine">Washing machine</option></select></label>
+<label><span>Result</span><select id="result-filter"><option value="all">All results</option><option value="correct">Both correct</option><option value="error">Any error</option></select></label>
+</div>
+<div class="table-wrap">
+<table class="review-table">
+<thead><tr><th scope="col">ID</th><th scope="col">Review</th><th scope="col">Sentiment</th><th scope="col">Topic</th><th scope="col">Result</th></tr></thead>
+<tbody id="review-table-body"><tr><td class="loading-cell" colspan="5">Loading model results…</td></tr></tbody>
+</table>
+</div>
+<div class="table-pagination">
+<button class="page-button" disabled id="previous-page" type="button">Previous</button>
+<span id="page-status">Page 1</span>
+<button class="page-button" id="next-page" type="button">Next</button>
+</div>
+</section>
+
+<section class="method-note" aria-labelledby="method-heading">
+<div>
+<p class="section-kicker">How to read this dashboard</p>
+<h2 id="method-heading">Snapshot and limitations</h2>
+</div>
+<div class="method-grid">
+<p><strong>Data.</strong> The page uses 500 synthetic product reviews from the test partition. Training rows are excluded.</p>
+<p><strong>Versioning.</strong> Every review has a unique ID. The snapshot records both the input timestamp and the model execution timestamp.</p>
+<p><strong>Interpretation.</strong> Perfect topic accuracy on synthetic data is promising but does not establish real-world performance. External review data is the next validation step.</p>
+</div>
+<div class="method-meta" id="method-meta">Pipeline 0.4.0 · Seed 42 · 20 epochs · TensorFlow 2.20.0</div>
+</section>
+</div>
+</main>
+
+<footer class="site-footer">
+<p class="footer-line">© 2026 Dr. Osvaldo L. Santos-Pereira. All rights reserved.</p>
+<p class="footer-tagline">Physics · Mathematics · Artificial Intelligence · Data Science</p>
+</footer>
+<script src="/js/navigation.js"></script>
+<script defer src="/js/lstm-dashboard.js?v=1"></script>
+</body>
+</html>
