@@ -21,7 +21,6 @@ PAGES = TEMPLATES / "pages"
 DATA = ROOT / "data"
 ERROR_SOURCE = TEMPLATES / "404.html"
 ERROR_OUTPUT = ROOT / "404.html"
-ROOT_SOURCE = TEMPLATES / "index.html"
 ROOT_OUTPUT = ROOT / "index.html"
 SITEMAP_OUTPUT = ROOT / "sitemap.xml"
 ROBOTS_OUTPUT = ROOT / "robots.txt"
@@ -261,6 +260,25 @@ def render_page(lang: str, key: str) -> str:
     )
 
 
+def render_root() -> str:
+    """Render the root URL as the English home while preserving /en/ as a valid URL."""
+    root = render_page("en", "home")
+    root = root.replace('<html lang="en">', '<html lang="und">', 1)
+    root = root.replace("<body>", '<body lang="en">', 1)
+    root = root.replace(
+        '<link href="https://ozsp12.github.io/en/" rel="canonical"/>',
+        '<link href="https://ozsp12.github.io/" rel="canonical"/>',
+        1,
+    )
+    root = root.replace(
+        '<meta content="https://ozsp12.github.io/en/" property="og:url"/>',
+        '<meta content="https://ozsp12.github.io/" property="og:url"/>',
+        1,
+    )
+    root = root.replace('href="/en/"', 'href="/"')
+    return root
+
+
 def published_path(lang: str, key: str) -> Path:
     return ROOT / lang / PAGE_PATHS[key]
 
@@ -335,7 +353,7 @@ def generated_artifacts() -> list[tuple[Path, str]]:
             artifacts.append((published_path(lang, key), render_page(lang, key)))
     artifacts.extend([
         (ERROR_OUTPUT, read(ERROR_SOURCE)),
-        (ROOT_OUTPUT, read(ROOT_SOURCE)),
+        (ROOT_OUTPUT, render_root()),
         (SITEMAP_OUTPUT, render_sitemap()),
         (ROBOTS_OUTPUT, render_robots()),
     ])
