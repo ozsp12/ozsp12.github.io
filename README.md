@@ -4,12 +4,14 @@ Bilingual personal and academic website published with GitHub Pages: https://ozs
 
 The site is static and generated deterministically from shared templates and structured data. The root URL (`/`) serves the English homepage directly; `/en/` is preserved as the explicit English route and `/pt/` contains the Portuguese version.
 
+`Projects` is part of the primary navigation and presents selected software, data science, AI, and computational work with demonstrable outputs. `Code` remains a secondary page under `About`, providing the broader index of public GitHub repositories.
+
 ## Structure
 
 ```text
 ozsp12.github.io/
 ├── index.html                  # generated English homepage at /
-├── en/                         # generated English pages
+├── en/                         # generated English pages and project pages
 ├── pt/                         # generated Portuguese pages
 ├── data/
 │   ├── publications.json       # publication source data
@@ -28,7 +30,7 @@ ozsp12.github.io/
     └── validate-integrations.yml # scheduled external-integration checks
 ```
 
-Generated pages should be updated through `templates/` and `data/`, then regenerated with the build script rather than maintained independently.
+Generated pages should be updated through `templates/` and `data/`, then regenerated with the build script rather than maintained independently. Standalone project dashboards may live below their corresponding project route, such as `/en/projects/lstm_ftw/`.
 
 ## Maintenance
 

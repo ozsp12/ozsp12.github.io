@@ -1,4 +1,4 @@
-/* PhysLab: compact project collection. */
+/* Compact project collection shared by PhysLab and Projects. */
 .physlab-list {
   list-style: none;
   margin: 22px 0 0;
@@ -31,6 +31,47 @@
   object-position: center;
   border: 1px solid var(--border);
   border-radius: 4px;
+}
+
+.project-thumb-card {
+  aspect-ratio: 560 / 408;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  padding: 13px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  font-family: var(--sans);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.project-thumb-card strong {
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 600;
+}
+
+.project-thumb-card span {
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.project-thumb-card small {
+  margin-top: 5px;
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--text-muted);
+}
+
+.project-thumb-card:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  text-decoration: none;
 }
 
 .physlab-project-title {
@@ -105,6 +146,14 @@
   .physlab-project {
     grid-template-columns: 100px minmax(0, 1fr);
     gap: 12px;
+  }
+
+  .project-thumb-card {
+    padding: 10px;
+  }
+
+  .project-thumb-card strong {
+    font-size: 20px;
   }
 
   .physlab-project-title {

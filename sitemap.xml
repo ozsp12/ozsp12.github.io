@@ -79,6 +79,18 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://ozsp12.github.io/" />
   </url>
   <url>
+    <loc>https://ozsp12.github.io/pt/projects/</loc>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://ozsp12.github.io/pt/projects/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ozsp12.github.io/en/projects/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ozsp12.github.io/" />
+  </url>
+  <url>
+    <loc>https://ozsp12.github.io/en/projects/</loc>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://ozsp12.github.io/pt/projects/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ozsp12.github.io/en/projects/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ozsp12.github.io/" />
+  </url>
+  <url>
     <loc>https://ozsp12.github.io/pt/repos/</loc>
     <xhtml:link rel="alternate" hreflang="pt" href="https://ozsp12.github.io/pt/repos/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://ozsp12.github.io/en/repos/" />
@@ -103,8 +115,8 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://ozsp12.github.io/" />
   </url>
   <url>
-    <loc>https://ozsp12.github.io/en/lstm_ftw/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ozsp12.github.io/en/lstm_ftw/" />
+    <loc>https://ozsp12.github.io/en/projects/lstm_ftw/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ozsp12.github.io/en/projects/lstm_ftw/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://ozsp12.github.io/" />
   </url>
 </urlset>
