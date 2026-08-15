@@ -4,8 +4,7 @@
   "latest_file": "latest.json",
   "run_files": [
     "run_manifest.json",
-    "predictions.csv",
-    "evaluation_predictions.csv"
+    "predictions.csv"
   ],
   "required_latest_fields": [
     "run_id"
@@ -13,7 +12,8 @@
   "required_manifest_fields": [
     "run_id",
     "status",
-    "model_timestamp"
+    "model_timestamp",
+    "input_generation"
   ],
   "required_status": "complete"
 }
