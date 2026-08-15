@@ -26,11 +26,13 @@ ESSENTIAL_FILES = [
     "en/publications/index.html",
     "pt/physlab/index.html",
     "en/physlab/index.html",
+    "pt/projects/index.html",
+    "en/projects/index.html",
     "pt/repos/index.html",
     "en/repos/index.html",
     "pt/contact/index.html",
     "en/contact/index.html",
-    "en/lstm_ftw/index.html",
+    "en/projects/lstm_ftw/index.html",
     "css/styles.css",
     "css/physlab.css",
     "css/lstm-dashboard.css",
@@ -38,7 +40,7 @@ ESSENTIAL_FILES = [
     "js/lstm-dashboard.js",
 ]
 
-STANDALONE_EN_PAGES = {"lstm_ftw/index.html"}
+STANDALONE_EN_PAGES = {"projects/lstm_ftw/index.html"}
 
 VOID_ELEMENTS = {
     "area", "base", "br", "col", "embed", "hr", "img", "input",
@@ -52,6 +54,7 @@ EXPECTED_PAGE_PATHS = {
     "research": "/research/",
     "publications": "/publications/",
     "physlab": "/physlab/",
+    "projects": "/projects/",
     "repos": "/repos/",
     "contact": "/contact/",
 }
@@ -293,10 +296,13 @@ class Validation:
 
             language = "pt" if rel_posix.startswith("pt/") else "en"
             physlab_href = f"/{language}/physlab/"
+            projects_href = f"/{language}/projects/"
+            repos_href = f"/{language}/repos/"
             nav_links = [
                 a for a in parser.anchors
                 if "nav-link" in a.get("class", "").split()
             ]
+
             physlab_links = [a for a in nav_links if a.get("href") == physlab_href]
             if len(physlab_links) != 2:
                 self.fail(
@@ -304,6 +310,17 @@ class Validation:
                     f"(2 links), found {len(physlab_links)}"
                 )
                 continue
+
+            projects_links = [a for a in nav_links if a.get("href") == projects_href]
+            if len(projects_links) != 2:
+                self.fail(
+                    f"{relative}: expected Projects in desktop and mobile navigation "
+                    f"(2 links), found {len(projects_links)}"
+                )
+                continue
+
+            if any(a.get("href") == repos_href for a in nav_links):
+                self.fail(f"{relative}: Code must remain outside primary navigation")
 
             is_physlab = "/physlab/" in f"/{rel_posix}"
             for link in physlab_links:
@@ -314,8 +331,10 @@ class Validation:
                 if not is_physlab and ("active" in classes or current):
                     self.fail(f"{relative}: PhysLab link must not be active/current off PhysLab page")
 
-            if rel_posix == "en/lstm_ftw/index.html":
-                expected_current = "/en/repos/"
+            if rel_posix == "en/projects/lstm_ftw/index.html":
+                expected_current = "/en/projects/"
+            elif rel_posix.endswith("/repos/index.html"):
+                expected_current = f"/{language}/about/"
             else:
                 expected_current = self.expected_nav_href(relative, language)
             current_nav_links = [
