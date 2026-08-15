@@ -71,7 +71,7 @@
 <div>
 <p class="dashboard-eyebrow">LSTM for the Win · Model results</p>
 <h1 id="dashboard-title">Product review classification</h1>
-<p class="dashboard-deck">A stakeholder view of how the pipeline classifies sentiment and product topic on the synthetic test set.</p>
+<p class="dashboard-deck">A stakeholder view of how the pipeline classifies sentiment and product topic on newly generated incoming reviews.</p>
 </div>
 <div class="hero-actions">
 <a class="dashboard-button dashboard-button-primary" href="https://github.com/ozsp12/lstm_for_the_win" rel="noopener noreferrer" target="_blank">View source</a>
@@ -80,7 +80,7 @@
 <div class="run-strip" aria-label="Model run metadata">
 <div><span>Run</span><strong id="run-id">Loading latest run…</strong></div>
 <div><span>Model executed</span><strong id="model-time">Loading…</strong></div>
-<div><span>Scope</span><strong>Synthetic · Test only</strong></div>
+<div><span>Scope</span><strong>Synthetic · Incoming</strong></div>
 <div><span>Status</span><strong class="status-loading" id="live-status"><i aria-hidden="true"></i> Loading live data</strong></div>
 </div>
 <p class="live-source-note"><span id="source-freshness">Reading the newest versioned workflow output from GitHub…</span> <a href="https://github.com/ozsp12/lstm_for_the_win/tree/main/data/output" id="source-run-link" rel="noopener noreferrer" target="_blank">View source files</a></p>
@@ -92,7 +92,7 @@
 <p class="section-kicker">Executive summary</p>
 <h2 id="overview-heading">Performance at a glance</h2>
 </div>
-<p class="section-note">Accuracy = correct predictions ÷ test reviews</p>
+<p class="section-note">Accuracy = correct predictions ÷ incoming reviews</p>
 </div>
 <div class="kpi-grid">
 <article class="kpi-card kpi-card-featured">
@@ -111,9 +111,9 @@
 <span id="kpi-joint-detail">Waiting for results</span>
 </article>
 <article class="kpi-card">
-<p>Test reviews</p>
+<p>Incoming reviews</p>
 <strong id="kpi-reviews">—</strong>
-<span>Unique test IDs</span>
+<span>Unique incoming IDs</span>
 </article>
 </div>
 
@@ -138,7 +138,7 @@
 <article class="panel">
 <div class="panel-heading">
 <div><p class="panel-kicker">Accuracy</p><h3>Model comparison</h3></div>
-<span class="panel-meta">Test set</span>
+<span class="panel-meta">Incoming batch</span>
 </div>
 <div class="bar-chart" id="model-accuracy-chart" aria-label="Accuracy by model"></div>
 </article>
@@ -200,7 +200,7 @@
 <p class="section-note" id="review-count">Loading reviews…</p>
 </div>
 <div class="filter-bar" role="search">
-<label class="search-field"><span>Search review or ID</span><input id="review-search" placeholder="e.g. door seal or 501" type="search"/></label>
+<label class="search-field"><span>Search review or ID</span><input id="review-search" placeholder="e.g. door seal or 6001" type="search"/></label>
 <label><span>Sentiment</span><select id="sentiment-filter"><option value="all">All sentiments</option><option value="negative">Negative</option><option value="neutral">Neutral</option><option value="positive">Positive</option></select></label>
 <label><span>Topic</span><select id="topic-filter"><option value="all">All topics</option><option value="refrigerator">Refrigerator</option><option value="smartphone">Smartphone</option><option value="television">Television</option><option value="washing_machine">Washing machine</option></select></label>
 <label><span>Result</span><select id="result-filter"><option value="all">All results</option><option value="correct">Both correct</option><option value="error">Any error</option></select></label>
@@ -224,11 +224,11 @@
 <h2 id="method-heading">Live data and limitations</h2>
 </div>
 <div class="method-grid">
-<p><strong>Data.</strong> The page reads <span id="data-review-count">the latest</span> synthetic product reviews from the versioned test output. Training rows are excluded.</p>
-<p><strong>Versioning.</strong> Every review has a unique ID. On each page load, the dashboard follows <code>latest.json</code> to the newest committed run and reads its input and model timestamps.</p>
-<p><strong>Interpretation.</strong> Perfect topic accuracy on synthetic data is promising but does not establish real-world performance. External review data is the next validation step.</p>
+<p><strong>Data.</strong> The page reads <span id="data-review-count">the latest</span> synthetic product reviews from the versioned incoming output. Training rows are excluded.</p>
+<p><strong>Versioning.</strong> Every review has a unique ID. On each page load, the dashboard follows <code>latest.json</code> to the newest committed run and reads its input generation and model timestamp.</p>
+<p><strong>Continual learning.</strong> A controlled fraction of incoming reviews is marked <code>goldtest</code> and promoted to the next training generation only after the current evaluation.</p>
 </div>
-<div class="method-meta" id="method-meta">Pipeline 0.4.0 · Seed 42 · 20 epochs · TensorFlow 2.20.0</div>
+<div class="method-meta" id="method-meta">Pipeline 0.5.0 · Seed 42 · 20 epochs · TensorFlow 2.20.0</div>
 </section>
 </div>
 </main>
@@ -238,6 +238,6 @@
 <p class="footer-tagline">Physics · Mathematics · Artificial Intelligence · Data Science</p>
 </footer>
 <script src="/js/navigation.js"></script>
-<script defer src="/js/lstm-dashboard.js?v=2"></script>
+<script defer src="/js/lstm-dashboard.js?v=3"></script>
 </body>
 </html>
