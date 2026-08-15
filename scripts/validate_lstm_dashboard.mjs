@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const scriptPath = path.join(root, "js", "lstm-dashboard.js");
-const htmlPath = path.join(root, "en", "lstm_ftw", "index.html");
+const htmlPath = path.join(root, "en", "projects", "lstm_ftw", "index.html");
 const contractPath = path.join(root, "data", "integrations", "lstm.json");
 const script = fs.readFileSync(scriptPath, "utf8");
 const html = fs.readFileSync(htmlPath, "utf8");
@@ -36,7 +36,7 @@ requireMatch(!script.includes("dashboard-data.json"), "dashboard must not refere
 requireMatch(!html.includes("dashboard-data.json"), "HTML must not reference the deleted fixed snapshot");
 requireMatch(!html.includes(">500<"), "HTML must not hard-code the old test-review count");
 requireMatch(!html.includes("69.0%"), "HTML must not hard-code the old sentiment accuracy");
-requireMatch(!fs.existsSync(path.join(root, "en", "lstm_ftw", "dashboard-data.json")), "fixed dashboard snapshot must be removed");
+requireMatch(!fs.existsSync(path.join(root, "en", "projects", "lstm_ftw", "dashboard-data.json")), "fixed dashboard snapshot must be removed");
 
 if (failures.length) {
   console.error(`LSTM dashboard validation failed with ${failures.length} error(s):`);
