@@ -21,7 +21,12 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Check generated HTML is in sync
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check generated files are in sync
         run: python scripts/build_site.py --check
 
       - name: Regenerate static site
@@ -36,5 +41,8 @@ jobs:
       - name: Validate static site
         run: python scripts/validate_site.py
 
-      - name: Validate live LSTM dashboard
+      - name: Validate LSTM dashboard structure
         run: node scripts/validate_lstm_dashboard.mjs
+
+      - name: Validate HTML and accessibility semantics
+        run: npx --yes html-validate@9.7.1 "index.html" "404.html" "en/**/*.html" "pt/**/*.html"

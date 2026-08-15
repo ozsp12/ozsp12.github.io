@@ -1,0 +1,24 @@
+name: Validate external integrations
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 09 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  lstm-data-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check LSTM live-data contract
+        run: node scripts/check_lstm_integration.mjs

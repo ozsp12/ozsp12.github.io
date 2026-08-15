@@ -1,0 +1,14 @@
+{
+  "extends": ["html-validate:recommended"],
+  "rules": {
+    "attr-quotes": "off",
+    "attribute-empty-style": "off",
+    "aria-label-misuse": "off",
+    "doctype-style": "off",
+    "hidden-focusable": "off",
+    "long-title": "off",
+    "no-inline-style": "off",
+    "unique-landmark": "off",
+    "void-style": "off"
+  }
+}

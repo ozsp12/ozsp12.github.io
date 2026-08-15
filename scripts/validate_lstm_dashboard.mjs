@@ -9,8 +9,10 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const scriptPath = path.join(root, "js", "lstm-dashboard.js");
 const htmlPath = path.join(root, "en", "lstm_ftw", "index.html");
+const contractPath = path.join(root, "data", "integrations", "lstm.json");
 const script = fs.readFileSync(scriptPath, "utf8");
 const html = fs.readFileSync(htmlPath, "utf8");
+const contract = JSON.parse(fs.readFileSync(contractPath, "utf8"));
 
 new vm.Script(script, { filename: scriptPath });
 
@@ -19,14 +21,11 @@ function requireMatch(condition, message) {
   if (!condition) failures.push(message);
 }
 
-requireMatch(
-  script.includes("https://raw.githubusercontent.com/ozsp12/lstm_for_the_win/main/data/output"),
-  "dashboard must read versioned output from the model repository"
-);
-requireMatch(script.includes("/latest.json?live="), "dashboard must resolve latest.json on every load");
-requireMatch(script.includes("/predictions.csv?live="), "dashboard must fetch predictions.csv");
-requireMatch(script.includes("/evaluation_predictions.csv?live="), "dashboard must fetch evaluation_predictions.csv");
-requireMatch(script.includes("/run_manifest.json?live="), "dashboard must fetch run_manifest.json");
+requireMatch(script.includes(contract.source_root), "dashboard source root must match the integration contract");
+requireMatch(script.includes(`/${contract.latest_file}?live=`), "dashboard must resolve the contract latest file on every load");
+for (const file of contract.run_files) {
+  requireMatch(script.includes(`/${file}?live=`), `dashboard must fetch ${file}`);
+}
 requireMatch(script.includes("cache: \"no-store\""), "live data requests must bypass the browser cache");
 requireMatch(script.includes("attempt < 3"), "dashboard must retry short-lived GitHub propagation failures");
 requireMatch(script.includes("predictions.csv contains duplicate IDs"), "dashboard must validate unique prediction IDs");
@@ -45,4 +44,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("LSTM dashboard validation passed: live source, cache bypass, schema guards, and fixed-snapshot removal are valid.");
+console.log("LSTM dashboard validation passed: local structure matches the declared external-data contract.");

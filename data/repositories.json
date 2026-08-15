@@ -1,0 +1,137 @@
+[
+  {
+    "name": "algorithms",
+    "title": "Algorithms",
+    "url": "https://github.com/ozsp12/algorithms",
+    "description": {
+      "en": "Collection of algorithm implementations, computational structures, and classic programming problems, organized for study, reference, and experimentation.",
+      "pt": "Coleção de implementações de algoritmos, estruturas computacionais e problemas clássicos de programação, organizada para estudo, referência e experimentação."
+    }
+  },
+  {
+    "name": "brownian_thoughts",
+    "title": "Brownian Thoughts",
+    "url": "https://github.com/ozsp12/brownian_thoughts",
+    "description": {
+      "en": "Repository for the Brownian Thoughts YouTube channel, with supporting material for videos on physics, mathematics, data science, artificial intelligence, and related topics.",
+      "pt": "Repositório do canal Brownian Thoughts no YouTube, com materiais de apoio para vídeos sobre física, matemática, ciência de dados, inteligência artificial e temas relacionados."
+    }
+  },
+  {
+    "name": "coinparadox",
+    "title": "Coin Paradox",
+    "url": "https://github.com/ozsp12/coinparadox",
+    "description": {
+      "en": "Computational resources and materials associated with the coin paradox, roulette curves, and Aristotle's wheel paradox.",
+      "pt": "Recursos computacionais e materiais associados ao paradoxo da moeda, curvas roletas e paradoxo da roda de Aristóteles."
+    }
+  },
+  {
+    "name": "computational_physics",
+    "title": "Computational Physics",
+    "url": "https://github.com/ozsp12/computational_physics",
+    "description": {
+      "en": "Notebooks, code, and simulations for computational-physics problems, numerical methods, dynamical systems, differential equations, and scientific modelling.",
+      "pt": "Notebooks, códigos e simulações para problemas de física computacional, métodos numéricos, sistemas dinâmicos, equações diferenciais e modelagem científica."
+    }
+  },
+  {
+    "name": "entropy_fm",
+    "title": "Entropy FM",
+    "url": "https://github.com/ozsp12/entropy_fm",
+    "description": {
+      "en": "Creative archive for an experimental AI-generated music project, including songs, artwork, audiovisual assets, and production material.",
+      "pt": "Arquivo criativo de um projeto experimental de música gerada com IA, incluindo músicas, artes, materiais audiovisuais e recursos de produção."
+    }
+  },
+  {
+    "name": "lstm_for_the_win",
+    "title": "LSTM for the Win",
+    "url": "https://github.com/ozsp12/lstm_for_the_win",
+    "description": {
+      "en": "LSTM-based text-classification pipeline for product reviews, with independent models for sentiment and product topic and a live results dashboard.",
+      "pt": "Pipeline de classificação de texto com LSTM para avaliações de produtos, com modelos independentes de sentimento e tópico e dashboard de resultados."
+    }
+  },
+  {
+    "name": "mba_usp_esalq",
+    "title": "MBA USP ESALQ",
+    "url": "https://github.com/ozsp12/mba_usp_esalq",
+    "description": {
+      "en": "Projects, code, and materials produced during the MBA in Big Data and Analytics at ESALQ-USP, including applications of statistics, data science, and machine learning.",
+      "pt": "Projetos, códigos e materiais produzidos durante o MBA em Big Data e Analytics da ESALQ-USP, incluindo aplicações de estatística, ciência de dados e machine learning."
+    }
+  },
+  {
+    "name": "number_types",
+    "title": "Number Types",
+    "url": "https://github.com/ozsp12/number_types",
+    "description": {
+      "en": "Implementations and experiments involving numeric types, number representations, computational classes, and mathematical operations.",
+      "pt": "Implementações e experimentos envolvendo tipos numéricos, representações de números, classes computacionais e operações matemáticas."
+    }
+  },
+  {
+    "name": "oz_youtube",
+    "title": "Oz YouTube",
+    "url": "https://github.com/ozsp12/oz_youtube",
+    "description": {
+      "en": "Repository of production assets and supporting material for videos published on the Oz YouTube channel.",
+      "pt": "Repositório de materiais de produção e recursos de apoio para vídeos publicados no canal Oz no YouTube."
+    }
+  },
+  {
+    "name": "ozsp12.github.io",
+    "title": "Personal Website",
+    "url": "https://github.com/ozsp12/ozsp12.github.io",
+    "description": {
+      "en": "Source code of this personal and academic website, including the bilingual static-site generator, validation tools, and GitHub Pages deployment.",
+      "pt": "Código-fonte deste site pessoal e acadêmico, incluindo o gerador estático bilíngue, ferramentas de validação e publicação no GitHub Pages."
+    }
+  },
+  {
+    "name": "physics_anim",
+    "title": "Physics Animations",
+    "url": "https://github.com/ozsp12/physics_anim",
+    "description": {
+      "en": "Computational animations and visual experiments for physics concepts and scientific communication.",
+      "pt": "Animações computacionais e experimentos visuais para conceitos de física e comunicação científica."
+    }
+  },
+  {
+    "name": "programacao_introducao",
+    "title": "Programming Introduction",
+    "url": "https://github.com/ozsp12/programacao_introducao",
+    "description": {
+      "en": "Introductory programming materials, exercises, examples, and computational notebooks for teaching and study.",
+      "pt": "Materiais introdutórios de programação, exercícios, exemplos e notebooks computacionais para ensino e estudo."
+    }
+  },
+  {
+    "name": "quantum_computing",
+    "title": "Quantum Computing",
+    "url": "https://github.com/ozsp12/quantum_computing",
+    "description": {
+      "en": "Code, notebooks, and study material on quantum computing, quantum information, circuits, algorithms, and simulation.",
+      "pt": "Códigos, notebooks e material de estudo sobre computação quântica, informação quântica, circuitos, algoritmos e simulação."
+    }
+  },
+  {
+    "name": "stack_analysis",
+    "title": "Stack Analysis",
+    "url": "https://github.com/ozsp12/stack_analysis",
+    "description": {
+      "en": "Investigative data-analysis project on Stack Overflow activity, focused on understanding the decline in newly posted questions.",
+      "pt": "Projeto investigativo de análise de dados sobre a atividade do Stack Overflow, focado em compreender a queda no número de novas perguntas."
+    }
+  },
+  {
+    "name": "water_density_physexp",
+    "title": "Water Density Physics Experiment",
+    "url": "https://github.com/ozsp12/water_density_physexp",
+    "description": {
+      "en": "Computational and experimental material for estimating water density using a metal rod and a water container.",
+      "pt": "Material computacional e experimental para estimar a densidade da água utilizando uma haste metálica e um recipiente com água."
+    }
+  }
+]
