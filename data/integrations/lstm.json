@@ -4,7 +4,8 @@
   "latest_file": "latest.json",
   "run_files": [
     "run_manifest.json",
-    "predictions.csv"
+    "predictions.csv",
+    "metrics.json"
   ],
   "required_latest_fields": [
     "run_id"
