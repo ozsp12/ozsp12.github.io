@@ -31,8 +31,12 @@ requireMatch(script.includes("sentiment_confidence"), "dashboard must use the cu
 requireMatch(script.includes("linguistic_level"), "dashboard must validate linguistic level metadata");
 requireMatch(script.includes("flagprofanity"), "dashboard must validate profanity metadata");
 requireMatch(script.includes("goldtest"), "dashboard must validate goldtest metadata");
+requireMatch(script.includes("baseline_metrics"), "dashboard must consume baseline metrics");
+requireMatch(script.includes("metric_delta_vs_baseline"), "dashboard must consume LSTM-baseline deltas");
+requireMatch(script.includes("TF-IDF + LR"), "dashboard must visibly compare the TF-IDF logistic-regression baseline");
 requireMatch(script.includes("predictions.csv contains duplicate IDs"), "dashboard must validate unique prediction IDs");
 requireMatch(script.includes("disagree on the model timestamp"), "dashboard must reconcile CSV and manifest timestamps");
+requireMatch(script.includes("accuracy disagrees with metrics.json"), "dashboard must reconcile prediction-derived accuracy with metrics.json");
 requireMatch(script.includes("cache: \"no-store\""), "live data requests must bypass the browser cache");
 requireMatch(script.includes("attempt < 3"), "dashboard must retry short-lived GitHub propagation failures");
 requireMatch(!script.includes("dashboard-data.json"), "dashboard must not reference a fixed snapshot");
@@ -46,4 +50,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("LSTM dashboard validation passed: local structure matches the incoming-data contract.");
+console.log("LSTM dashboard validation passed: incoming predictions and LSTM-versus-baseline metrics are wired correctly.");
