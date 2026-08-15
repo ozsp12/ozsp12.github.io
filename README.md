@@ -30,7 +30,7 @@ ozsp12.github.io/
     └── validate-integrations.yml # scheduled external-integration checks
 ```
 
-Generated pages should be updated through `templates/` and `data/`, then regenerated with the build script rather than maintained independently. Standalone project dashboards may live below their corresponding project route, such as `/en/projects/lstm_ftw/`.
+Generated pages should be updated through `templates/` and `data/`, then regenerated with the build script rather than maintained independently. Standalone project dashboards may live below their corresponding project route, such as `/en/projects/lstm_ftw/`. Research is presented as horizontal thematic rails, while generated research/project card artwork is versioned locally under `assets/`.
 
 ## Maintenance
 

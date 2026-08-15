@@ -35,9 +35,17 @@ ESSENTIAL_FILES = [
     "en/projects/lstm_ftw/index.html",
     "css/styles.css",
     "css/physlab.css",
+    "css/research.css",
+    "css/home-featured.css",
     "css/lstm-dashboard.css",
     "js/navigation.js",
     "js/lstm-dashboard.js",
+    "assets/research-gravitation.jpg",
+    "assets/research-complex-systems.jpg",
+    "assets/research-ai-data.jpg",
+    "assets/research-mathematics.jpg",
+    "assets/research-broader-interests.jpg",
+    "assets/project-lstm.jpg",
 ]
 
 STANDALONE_EN_PAGES = {"projects/lstm_ftw/index.html"}
@@ -211,12 +219,12 @@ class Validation:
                 continue
 
             if rel_posix == "index.html":
-                if parser.html_lang != "und":
-                    self.fail("index.html: root page must use lang=\"und\"")
+                if not (parser.html_lang or "").lower().startswith("en"):
+                    self.fail("index.html: canonical root homepage must declare lang=en")
                 expected_canonical = "https://ozsp12.github.io/"
                 expected_alternates = {
                     "pt": "https://ozsp12.github.io/pt/",
-                    "en": "https://ozsp12.github.io/en/",
+                    "en": "https://ozsp12.github.io/",
                     "x-default": "https://ozsp12.github.io/",
                 }
             elif rel_posix.startswith("pt/"):
@@ -224,28 +232,37 @@ class Validation:
                     self.fail(f"{relative}: Portuguese page must declare lang=pt")
                 suffix = self.page_suffix(relative, "pt")
                 expected_canonical = f"https://ozsp12.github.io/pt{suffix}"
+                en_alternate = "https://ozsp12.github.io/" if suffix == "/" else f"https://ozsp12.github.io/en{suffix}"
                 expected_alternates = {
                     "pt": f"https://ozsp12.github.io/pt{suffix}",
-                    "en": f"https://ozsp12.github.io/en{suffix}",
+                    "en": en_alternate,
                     "x-default": "https://ozsp12.github.io/",
                 }
             elif rel_posix.startswith("en/"):
                 if not (parser.html_lang or "").lower().startswith("en"):
                     self.fail(f"{relative}: English page must declare lang=en")
                 suffix = self.page_suffix(relative, "en")
-                expected_canonical = f"https://ozsp12.github.io/en{suffix}"
-                standalone = relative.relative_to("en").as_posix() in STANDALONE_EN_PAGES
-                if standalone:
+                if suffix == "/":
+                    expected_canonical = "https://ozsp12.github.io/"
                     expected_alternates = {
-                        "en": f"https://ozsp12.github.io/en{suffix}",
+                        "pt": "https://ozsp12.github.io/pt/",
+                        "en": "https://ozsp12.github.io/",
                         "x-default": "https://ozsp12.github.io/",
                     }
                 else:
-                    expected_alternates = {
-                        "pt": f"https://ozsp12.github.io/pt{suffix}",
-                        "en": f"https://ozsp12.github.io/en{suffix}",
-                        "x-default": "https://ozsp12.github.io/",
-                    }
+                    expected_canonical = f"https://ozsp12.github.io/en{suffix}"
+                    standalone = relative.relative_to("en").as_posix() in STANDALONE_EN_PAGES
+                    if standalone:
+                        expected_alternates = {
+                            "en": f"https://ozsp12.github.io/en{suffix}",
+                            "x-default": "https://ozsp12.github.io/",
+                        }
+                    else:
+                        expected_alternates = {
+                            "pt": f"https://ozsp12.github.io/pt{suffix}",
+                            "en": f"https://ozsp12.github.io/en{suffix}",
+                            "x-default": "https://ozsp12.github.io/",
+                        }
             else:
                 continue
 
@@ -439,7 +456,7 @@ class Validation:
                 )
 
     def check_css_and_javascript_guards(self) -> None:
-        for css_path in (ROOT / "css/styles.css", ROOT / "css/lstm-dashboard.css"):
+        for css_path in (ROOT / "css/styles.css", ROOT / "css/lstm-dashboard.css", ROOT / "css/research.css", ROOT / "css/home-featured.css"):
             if not css_path.is_file():
                 continue
             css = css_path.read_text(encoding="utf-8")
