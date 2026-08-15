@@ -25,7 +25,7 @@ ROOT_OUTPUT = ROOT / "index.html"
 SITEMAP_OUTPUT = ROOT / "sitemap.xml"
 ROBOTS_OUTPUT = ROOT / "robots.txt"
 
-PAGE_KEYS = ("home", "about", "teaching", "research", "publications", "physlab", "repos", "contact")
+PAGE_KEYS = ("home", "about", "teaching", "research", "publications", "physlab", "projects", "repos", "contact")
 PAGE_PATHS = {
     "home": "index.html",
     "about": "about/index.html",
@@ -33,6 +33,7 @@ PAGE_PATHS = {
     "research": "research/index.html",
     "publications": "publications/index.html",
     "physlab": "physlab/index.html",
+    "projects": "projects/index.html",
     "repos": "repos/index.html",
     "contact": "contact/index.html",
 }
@@ -44,9 +45,13 @@ NAVIGATION = (
     ("research", {"pt": "Pesquisa", "en": "Research"}),
     ("publications", {"pt": "Publicações", "en": "Papers"}),
     ("physlab", {"pt": "PhysLab", "en": "PhysLab"}),
-    ("repos", {"pt": "Código", "en": "Code"}),
+    ("projects", {"pt": "Projetos", "en": "Projects"}),
     ("contact", {"pt": "Contato", "en": "Contact"}),
 )
+
+NAV_PARENT = {
+    "repos": "about",
+}
 
 LANGUAGE_TEXT = {
     "pt": {
@@ -103,10 +108,11 @@ def href(lang: str, key: str) -> str:
 
 
 def nav_links(lang: str, active_key: str) -> str:
+    active_nav_key = NAV_PARENT.get(active_key, active_key)
     lines = []
     for key, labels in NAVIGATION:
         attrs = ' class="nav-link"'
-        if key == active_key:
+        if key == active_nav_key:
             attrs = ' aria-current="page" class="nav-link active"'
         lines.append(f'<a{attrs} href="{href(lang, key)}">{labels[lang]}</a>')
     return "\n".join(lines)
@@ -246,7 +252,7 @@ def render_page(lang: str, key: str) -> str:
         main = replace_tokens(main, {"PUBLICATION_LIST": render_publications(lang)})
     elif key == "repos":
         main = replace_tokens(main, {"REPOSITORY_LIST": render_repositories(lang)})
-    extra_styles = '<link href="/css/physlab.css?v=2" rel="stylesheet"/>' if key == "physlab" else ""
+    extra_styles = '<link href="/css/physlab.css?v=2" rel="stylesheet"/>' if key in {"physlab", "projects"} else ""
     return replace_tokens(
         read(TEMPLATES / "base.html"),
         {
@@ -333,7 +339,7 @@ def render_sitemap() -> str:
         alternates = {"pt": pt_url, "en": en_url, "x-default": f"{base}/"}
         entries.append(sitemap_entry(pt_url, alternates))
         entries.append(sitemap_entry(en_url, alternates))
-    entries.append(sitemap_entry(f"{base}/en/lstm_ftw/", {"en": f"{base}/en/lstm_ftw/", "x-default": f"{base}/"}))
+    entries.append(sitemap_entry(f"{base}/en/projects/lstm_ftw/", {"en": f"{base}/en/projects/lstm_ftw/", "x-default": f"{base}/"}))
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
