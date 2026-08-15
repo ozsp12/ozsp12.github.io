@@ -22,20 +22,22 @@ function requireMatch(condition, message) {
 }
 
 requireMatch(script.includes(contract.source_root), "dashboard source root must match the integration contract");
-requireMatch(script.includes(`/${contract.latest_file}?live=`), "dashboard must resolve the contract latest file on every load");
+requireMatch(script.includes(`/${contract.latest_file}?live=`), "dashboard must resolve latest.json on every load");
 for (const file of contract.run_files) {
   requireMatch(script.includes(`/${file}?live=`), `dashboard must fetch ${file}`);
 }
+requireMatch(!script.includes("evaluation_predictions.csv"), "dashboard must not depend on the removed evaluation_predictions.csv");
+requireMatch(script.includes("sentiment_confidence"), "dashboard must use the current prediction confidence schema");
+requireMatch(script.includes("linguistic_level"), "dashboard must validate linguistic level metadata");
+requireMatch(script.includes("flagprofanity"), "dashboard must validate profanity metadata");
+requireMatch(script.includes("goldtest"), "dashboard must validate goldtest metadata");
+requireMatch(script.includes("predictions.csv contains duplicate IDs"), "dashboard must validate unique prediction IDs");
+requireMatch(script.includes("disagree on the model timestamp"), "dashboard must reconcile CSV and manifest timestamps");
 requireMatch(script.includes("cache: \"no-store\""), "live data requests must bypass the browser cache");
 requireMatch(script.includes("attempt < 3"), "dashboard must retry short-lived GitHub propagation failures");
-requireMatch(script.includes("predictions.csv contains duplicate IDs"), "dashboard must validate unique prediction IDs");
-requireMatch(script.includes("predictions.csv contains non-test rows"), "dashboard must enforce test-only predictions");
-requireMatch(script.includes("Each prediction must have two evaluation rows"), "dashboard must reconcile both classifier outputs");
-requireMatch(script.includes("disagree on the model timestamp"), "dashboard must reconcile CSV and manifest timestamps");
-requireMatch(!script.includes("dashboard-data.json"), "dashboard must not reference the deleted fixed snapshot");
-requireMatch(!html.includes("dashboard-data.json"), "HTML must not reference the deleted fixed snapshot");
-requireMatch(!html.includes(">500<"), "HTML must not hard-code the old test-review count");
-requireMatch(!html.includes("69.0%"), "HTML must not hard-code the old sentiment accuracy");
+requireMatch(!script.includes("dashboard-data.json"), "dashboard must not reference a fixed snapshot");
+requireMatch(!html.includes("Synthetic · Test only"), "dashboard HTML must not describe the obsolete test split");
+requireMatch(!html.includes("test reviews"), "dashboard HTML must use incoming terminology");
 requireMatch(!fs.existsSync(path.join(root, "en", "projects", "lstm_ftw", "dashboard-data.json")), "fixed dashboard snapshot must be removed");
 
 if (failures.length) {
@@ -44,4 +46,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("LSTM dashboard validation passed: local structure matches the declared external-data contract.");
+console.log("LSTM dashboard validation passed: local structure matches the incoming-data contract.");
