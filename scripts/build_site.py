@@ -57,6 +57,7 @@ LANGUAGE_TEXT = {
     "pt": {
         "skip": "Ir para o conteúdo",
         "nav": "Navegação principal",
+        "mobile_nav": "Navegação móvel",
         "menu": "Abrir menu",
         "footer_line": "© 2026 Dr. Osvaldo L. Santos-Pereira. Todos os direitos reservados.",
         "footer_tagline": "Física · Matemática · Inteligência Artificial · Ciência de Dados",
@@ -64,6 +65,7 @@ LANGUAGE_TEXT = {
     "en": {
         "skip": "Skip to content",
         "nav": "Primary navigation",
+        "mobile_nav": "Mobile navigation",
         "menu": "Open menu",
         "footer_line": "© 2026 Dr. Osvaldo L. Santos-Pereira. All rights reserved.",
         "footer_tagline": "Physics · Mathematics · Artificial Intelligence · Data Science",
@@ -164,6 +166,7 @@ def render_header(lang: str, key: str) -> str:
             "MENU_LABEL": text["menu"],
             "DESKTOP_NAV": nav_links(lang, key),
             "MOBILE_NAV": nav_links(lang, key),
+            "MOBILE_NAV_LABEL": text["mobile_nav"],
             "DESKTOP_LANGUAGE_SWITCH": language_switch(lang, key, desktop=True),
             "MOBILE_LANGUAGE_SWITCH": language_switch(lang, key, desktop=False),
         },
@@ -252,7 +255,14 @@ def render_page(lang: str, key: str) -> str:
         main = replace_tokens(main, {"PUBLICATION_LIST": render_publications(lang)})
     elif key == "repos":
         main = replace_tokens(main, {"REPOSITORY_LIST": render_repositories(lang)})
-    extra_styles = '<link href="/css/physlab.css?v=2" rel="stylesheet"/>' if key in {"physlab", "projects"} else ""
+    extra_style_links = []
+    if key in {"physlab", "projects"}:
+        extra_style_links.append('<link href="/css/physlab.css?v=2" rel="stylesheet"/>')
+    if key == "research":
+        extra_style_links.append('<link href="/css/research.css?v=1" rel="stylesheet"/>')
+    if key == "home":
+        extra_style_links.append('<link href="/css/home-featured.css?v=1" rel="stylesheet"/>')
+    extra_styles = "\n".join(extra_style_links)
     return replace_tokens(
         read(TEMPLATES / "base.html"),
         {
@@ -267,20 +277,8 @@ def render_page(lang: str, key: str) -> str:
 
 
 def render_root() -> str:
-    """Render the root URL as the English home while preserving /en/ as a valid URL."""
+    """Render the root URL as the canonical English homepage."""
     root = render_page("en", "home")
-    root = root.replace('<html lang="en">', '<html lang="und">', 1)
-    root = root.replace("<body>", '<body lang="en">', 1)
-    root = root.replace(
-        '<link href="https://ozsp12.github.io/en/" rel="canonical"/>',
-        '<link href="https://ozsp12.github.io/" rel="canonical"/>',
-        1,
-    )
-    root = root.replace(
-        '<meta content="https://ozsp12.github.io/en/" property="og:url"/>',
-        '<meta content="https://ozsp12.github.io/" property="og:url"/>',
-        1,
-    )
     root = root.replace('href="/en/"', 'href="/"')
     return root
 
@@ -332,8 +330,14 @@ def sitemap_entry(location: str, alternates: dict[str, str] | None = None) -> st
 
 def render_sitemap() -> str:
     base = "https://ozsp12.github.io"
-    entries = [sitemap_entry(f"{base}/", {"pt": f"{base}/pt/", "en": f"{base}/en/", "x-default": f"{base}/"})]
+    home_alternates = {"pt": f"{base}/pt/", "en": f"{base}/", "x-default": f"{base}/"}
+    entries = [
+        sitemap_entry(f"{base}/", home_alternates),
+        sitemap_entry(f"{base}/pt/", home_alternates),
+    ]
     for key in PAGE_KEYS:
+        if key == "home":
+            continue
         pt_url = base + href("pt", key)
         en_url = base + href("en", key)
         alternates = {"pt": pt_url, "en": en_url, "x-default": f"{base}/"}

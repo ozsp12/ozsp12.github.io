@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     panel.classList.toggle('open', open);
     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     toggle.setAttribute('aria-label', open ? closeLabel : openLabel);
-    panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+    panel.hidden = !open;
 
     if (!open && returnFocus) {
       toggle.focus();

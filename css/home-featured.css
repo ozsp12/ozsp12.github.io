@@ -1,0 +1,13 @@
+/* Compact selected-work module for the homepage. */
+.home-featured { border-top: 1px solid var(--border); padding: 42px 0 72px; }
+.home-featured-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: 240px minmax(0, 520px); gap: 32px; align-items: center; }
+.home-featured-media { display: block; overflow: hidden; border: 1px solid var(--border); border-radius: 6px; outline-offset: 3px; }
+.home-featured-media img { width: 100%; aspect-ratio: 48 / 35; object-fit: cover; }
+.home-featured-kicker { margin: 0 0 7px; font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text-muted); }
+.home-featured-title { margin: 0 0 8px; font-family: var(--serif); font-size: 23px; font-weight: 600; line-height: 1.25; }
+.home-featured-copy { margin: 0 0 13px; font-family: var(--sans); font-size: 14.5px; line-height: 1.65; color: var(--text-muted); }
+.home-featured-links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0; padding: 0; list-style: none; }
+.home-featured-links a { font-family: var(--sans); font-size: 13.5px; color: var(--accent); border-bottom: 1px solid transparent; }
+.home-featured-links a:hover, .home-featured-links a:focus-visible { border-bottom-color: var(--accent); text-decoration: none; }
+.home-featured-media:focus-visible, .home-featured-links a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 720px) { .home-featured { padding: 34px 0 56px; } .home-featured-inner { grid-template-columns: minmax(0, 1fr); gap: 22px; } .home-featured-media { width: min(300px, 100%); } }
