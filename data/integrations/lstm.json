@@ -1,0 +1,19 @@
+{
+  "name": "lstm_for_the_win",
+  "source_root": "https://raw.githubusercontent.com/ozsp12/lstm_for_the_win/main/data/output",
+  "latest_file": "latest.json",
+  "run_files": [
+    "run_manifest.json",
+    "predictions.csv",
+    "evaluation_predictions.csv"
+  ],
+  "required_latest_fields": [
+    "run_id"
+  ],
+  "required_manifest_fields": [
+    "run_id",
+    "status",
+    "model_timestamp"
+  ],
+  "required_status": "complete"
+}
