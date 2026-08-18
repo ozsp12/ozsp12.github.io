@@ -85,12 +85,12 @@
 </section>
 
 <section class="method-note" aria-labelledby="method-heading"><div><p class="section-kicker">How to read this dashboard</p><h2 id="method-heading">Data provenance and limitations</h2></div><div class="method-grid">
-<p><strong>Data.</strong> The primary cards and explorer display the newest synthetic incoming batch. New-format runs also retain an immutable synthetic benchmark for longitudinal comparisons.</p>
-<p><strong>Versioning.</strong> <code>latest.json</code> resolves the newest retained run. New runs expose one immutable <code>run.json</code>; paper analyses and any later CSV or Parquet views are derived directly from that same run artifact.</p>
+<p><strong>Data.</strong> The primary cards and explorer display the newest synthetic incoming batch. Runs also retain an immutable synthetic benchmark for longitudinal comparisons.</p>
+<p><strong>Versioning.</strong> <code>latest.json</code> resolves the newest retained run. Each run exposes one immutable <code>run.json</code>; paper analyses and any later CSV or Parquet views are derived directly from that same run artifact.</p>
 <p><strong>Continual learning.</strong> A controlled fraction of incoming reviews marked <code>goldtest</code> is promoted after evaluation. The immutable benchmark contains only non-gold rows and never enters training.</p>
 <p><strong>Scope.</strong> These metrics characterize a controlled synthetic generator distribution. No real external dataset is evaluated here, so the dashboard does not claim external generalization.</p>
 </div><div class="method-meta" id="method-meta">Loading pipeline metadata…</div></section>
 </div></main>
 <footer class="site-footer"><p class="footer-line">© 2026 Dr. Osvaldo L. Santos-Pereira. All rights reserved.</p><p class="footer-tagline">Physics · Mathematics · Artificial Intelligence · Data Science</p></footer>
-<script src="/js/navigation.js"></script><script defer src="/js/lstm-dashboard.js?v=5"></script>
+<script src="/js/navigation.js"></script><script defer src="/js/lstm-dashboard.js?v=6"></script>
 </body></html>
