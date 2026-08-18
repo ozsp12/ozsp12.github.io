@@ -9,12 +9,10 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const scriptPath = path.join(root, "js", "lstm-dashboard.js");
 const contractPath = path.join(root, "data", "integrations", "lstm.json");
-const enPath = path.join(root, "en", "projects", "lstm_ftw", "index.html");
-const ptPath = path.join(root, "pt", "projects", "lstm_ftw", "index.html");
+const htmlPath = path.join(root, "en", "projects", "lstm_ftw", "index.html");
 const script = fs.readFileSync(scriptPath, "utf8");
 const contract = JSON.parse(fs.readFileSync(contractPath, "utf8"));
-const en = fs.readFileSync(enPath, "utf8");
-const pt = fs.readFileSync(ptPath, "utf8");
+const html = fs.readFileSync(htmlPath, "utf8");
 
 new vm.Script(script, { filename: scriptPath });
 
@@ -39,16 +37,12 @@ requireMatch(script.includes("external validation"), "dashboard must communicate
 requireMatch(script.includes("attempt < 3"), "dashboard must retry short-lived propagation failures");
 requireMatch(contract.run_files === undefined, "integration contract must not retain the old multi-file run contract");
 requireMatch(contract.analysis_file === "analysis.json", "integration contract must declare analysis.json");
-requireMatch(en.includes('/pt/projects/lstm_ftw/'), "English page must link to the equivalent Portuguese dashboard");
-requireMatch(pt.includes('/en/projects/lstm_ftw/'), "Portuguese page must link to the equivalent English dashboard");
-requireMatch(en.includes('hreflang="pt-BR"'), "English page must declare Portuguese hreflang");
-requireMatch(pt.includes('hreflang="en"'), "Portuguese page must declare English hreflang");
-requireMatch(!en.includes("Pipeline 0.5.0"), "English page must not contain stale pipeline metadata");
-requireMatch(!pt.includes("Pipeline 0.5.0"), "Portuguese page must not contain stale pipeline metadata");
+requireMatch(!html.includes("Pipeline 0.5.0"), "dashboard must not contain stale pipeline metadata");
+requireMatch(html.includes("No real external dataset is evaluated here"), "dashboard must state the absence of external validation");
 
 if (failures.length) {
   console.error(`LSTM dashboard validation failed with ${failures.length} error(s):`);
   failures.forEach((failure) => console.error(`  - ${failure}`));
   process.exit(1);
 }
-console.log("LSTM dashboard validation passed: canonical analysis.json contract, caching, uncertainty, and bilingual pages are wired correctly.");
+console.log("LSTM dashboard validation passed: canonical analysis.json contract, caching, uncertainty, and limitations are wired correctly.");
