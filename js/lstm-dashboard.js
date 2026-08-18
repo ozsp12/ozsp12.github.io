@@ -1,16 +1,38 @@
 (function () {
   "use strict";
 
-  const OUTPUT_ROOT = "https://raw.githubusercontent.com/ozsp12/lstm_for_the_win/main/data/output";
-  const OUTPUT_BROWSER_ROOT = "https://github.com/ozsp12/lstm_for_the_win/tree/main/data/output";
+  const CONTRACT_URL = "/data/integrations/lstm.json";
   const SENTIMENT_ORDER = ["negative", "neutral", "positive"];
   const TOPIC_ORDER = ["refrigerator", "smartphone", "television", "washing_machine"];
   const LEVELS = ["limited", "informal", "standard", "advanced", "technical"];
   const PAGE_SIZE = 20;
+  const IS_PT = document.documentElement.lang.toLowerCase().startsWith("pt");
   const state = { data: null, filtered: [], page: 1 };
 
+  const copy = IS_PT ? {
+    correct: "corretas", reviews: "avaliações", loading: "Carregando metadados do pipeline…",
+    live: "Ao vivo", unavailable: "Dados indisponíveis", noResults: "Nenhuma avaliação corresponde aos filtros selecionados.",
+    page: "Página", of: "de", showing: "Exibindo", bothCorrect: "Ambos corretos", twoErrors: "Dois erros",
+    topicError: "Erro de tópico", sentimentError: "Erro de sentimento", expected: "Esperado", confidence: "confiança",
+    incomingReviews: "avaliações de entrada", correctHint: "correto", errorHint: "erro", noneHint: "nenhum",
+    batchTitle: "Comparação no lote sintético atual", baselineTitle: "O baseline linear supera a LSTM no lote sintético atual.",
+    tradeoffTitle: "LSTM e baseline linear apresentam diferenças dependentes da tarefa no lote sintético atual.",
+    sourceError: "Os resultados do modelo não puderam ser carregados ou não passaram pela validação. Nenhum resultado em cache foi exibido.",
+    sourceInvalid: "A fonte ao vivo não pôde ser validada.",
+  } : {
+    correct: "correct", reviews: "reviews", loading: "Loading pipeline metadata…",
+    live: "Live", unavailable: "Data unavailable", noResults: "No reviews match the selected filters.",
+    page: "Page", of: "of", showing: "Showing", bothCorrect: "Both correct", twoErrors: "Two errors",
+    topicError: "Topic error", sentimentError: "Sentiment error", expected: "Expected", confidence: "confidence",
+    incomingReviews: "incoming reviews", correctHint: "correct", errorHint: "error", noneHint: "none",
+    batchTitle: "Comparison on the current synthetic batch", baselineTitle: "The linear baseline outperforms the LSTM on the current synthetic batch.",
+    tradeoffTitle: "The LSTM and linear baseline show task-dependent differences on the current synthetic batch.",
+    sourceError: "Live model results could not be loaded or did not pass validation. No cached result is being shown.",
+    sourceInvalid: "The live source could not be validated.",
+  };
+
   const byId = (id) => document.getElementById(id);
-  const number = (value) => new Intl.NumberFormat("en-US").format(Number(value));
+  const number = (value) => new Intl.NumberFormat(IS_PT ? "pt-BR" : "en-US").format(Number(value));
   const percent = (value, digits = 1) => `${(Number(value) * 100).toFixed(digits)}%`;
   const points = (value, digits = 1) => `${Number(value) >= 0 ? "+" : ""}${(Number(value) * 100).toFixed(digits)} pp`;
   const label = (value) => String(value).replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -25,74 +47,25 @@
     if (!condition) throw new Error(message);
   }
 
+  function requireFields(object, fields, labelName) {
+    assert(object && typeof object === "object", `${labelName} is missing.`);
+    const missing = fields.filter((field) => !Object.hasOwn(object, field));
+    assert(!missing.length, `${labelName} is missing fields: ${missing.join(", ")}.`);
+  }
+
   function formatTimestamp(value) {
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return new Intl.DateTimeFormat("en-GB", {
+    if (Number.isNaN(date.getTime())) return String(value);
+    return new Intl.DateTimeFormat(IS_PT ? "pt-BR" : "en-GB", {
       day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
       timeZone: "UTC", timeZoneName: "short",
     }).format(date);
   }
 
-  async function fetchText(url) {
-    const response = await fetch(url, { cache: "no-store" });
-    if (!response.ok) throw new Error(`Live data request failed (${response.status}): ${url}`);
-    return response.text();
-  }
-
-  async function fetchJson(url) {
-    const response = await fetch(url, { cache: "no-store" });
-    if (!response.ok) throw new Error(`Live data request failed (${response.status}): ${url}`);
+  async function fetchJson(url, cache = "default") {
+    const response = await fetch(url, { cache });
+    if (!response.ok) throw new Error(`Data request failed (${response.status}): ${url}`);
     return response.json();
-  }
-
-  function parseCsv(text) {
-    const records = [];
-    let row = [], field = "", quoted = false;
-    for (let i = 0; i < text.length; i += 1) {
-      const c = text[i];
-      if (quoted) {
-        if (c === '"' && text[i + 1] === '"') { field += '"'; i += 1; }
-        else if (c === '"') quoted = false;
-        else field += c;
-      } else if (c === '"') quoted = true;
-      else if (c === ",") { row.push(field); field = ""; }
-      else if (c === "\n") {
-        row.push(field.replace(/\r$/, ""));
-        if (row.some((v) => v !== "")) records.push(row);
-        row = []; field = "";
-      } else field += c;
-    }
-    assert(!quoted, "CSV contains an unterminated quoted field.");
-    if (field || row.length) {
-      row.push(field.replace(/\r$/, ""));
-      if (row.some((v) => v !== "")) records.push(row);
-    }
-    assert(records.length > 1, "CSV contains no data rows.");
-    const headers = records[0];
-    assert(headers.length === new Set(headers).size, "CSV contains duplicate column names.");
-    return records.slice(1).map((values, i) => {
-      assert(values.length === headers.length, `CSV row ${i + 2} has an invalid column count.`);
-      return Object.fromEntries(headers.map((h, j) => [h, values[j]]));
-    });
-  }
-
-  function requireFields(rows, required) {
-    assert(rows.length, "predictions.csv contains no rows.");
-    const fields = new Set(Object.keys(rows[0]));
-    const missing = required.filter((field) => !fields.has(field));
-    assert(!missing.length, `predictions.csv is missing columns: ${missing.join(", ")}.`);
-  }
-
-  function parseBool(value, field, id) {
-    const normalized = String(value).toLowerCase();
-    assert(["true", "false"].includes(normalized), `Invalid ${field} flag for ID ${id}.`);
-    return normalized === "true";
-  }
-
-  function parseBinary(value, field, id) {
-    assert(["0", "1"].includes(String(value)), `Invalid ${field} flag for ID ${id}.`);
-    return Number(value);
   }
 
   function countBy(rows, field, labels) {
@@ -128,96 +101,91 @@
     };
   }
 
-  function validateMetricTask(metrics, task) {
-    assert(metrics && typeof metrics === "object", `metrics.json is missing ${task}.`);
+  function validateTask(taskData, task, contract) {
+    requireFields(taskData, contract.required_task_fields, `analysis.tasks.${task}`);
     for (const group of ["metrics", "baseline_metrics", "metric_delta_vs_baseline"]) {
-      assert(metrics[group] && typeof metrics[group] === "object", `metrics.json is missing ${task}.${group}.`);
+      assert(taskData[group] && typeof taskData[group] === "object", `Missing ${task}.${group}.`);
     }
     for (const key of ["accuracy", "macro_f1", "weighted_f1", "log_loss", "brier_score"]) {
-      assert(Number.isFinite(Number(metrics.metrics[key])), `Invalid ${task} LSTM ${key}.`);
-      assert(Number.isFinite(Number(metrics.baseline_metrics[key])), `Invalid ${task} baseline ${key}.`);
+      assert(Number.isFinite(Number(taskData.metrics[key])), `Invalid ${task} LSTM ${key}.`);
+      assert(Number.isFinite(Number(taskData.baseline_metrics[key])), `Invalid ${task} baseline ${key}.`);
     }
+    const ci = taskData.uncertainty && taskData.uncertainty.accuracy_ci95;
+    assert(ci && ci.method === "wilson", `Missing ${task} 95% Wilson accuracy interval.`);
+    assert(Number(ci.low) >= 0 && Number(ci.high) <= 1 && Number(ci.low) <= Number(ci.high), `Invalid ${task} confidence interval.`);
   }
 
-  function buildDashboardData(manifest, rows, metricData, urls) {
-    requireFields(rows, [
-      "ID", "text", "expected_sentiment", "expected_topic", "predicted_sentiment", "predicted_topic",
-      "sentiment_confidence", "topic_confidence", "sentiment_correct", "topic_correct",
-      "linguistic_level", "flagprofanity", "goldtest", "input_timestamp", "model_timestamp",
-    ]);
-    assert(manifest.status === "complete", "The latest run is not complete.");
-    assert(manifest.run_id === urls.runId, "latest.json and run_manifest.json disagree on the run ID.");
-    assert(rows.every((row) => row.model_timestamp === manifest.model_timestamp), "predictions.csv and run_manifest.json disagree on the model timestamp.");
-    validateMetricTask(metricData.sentiment, "sentiment");
-    validateMetricTask(metricData.topic, "topic");
+  function normalizeReview(row) {
+    const id = Number(row.ID);
+    assert(Number.isInteger(id), `Invalid review ID: ${row.ID}.`);
+    const sentimentConfidence = Number(row.sentiment_confidence);
+    const topicConfidence = Number(row.topic_confidence);
+    assert(Number.isFinite(sentimentConfidence) && sentimentConfidence >= 0 && sentimentConfidence <= 1, `Invalid sentiment confidence for ID ${id}.`);
+    assert(Number.isFinite(topicConfidence) && topicConfidence >= 0 && topicConfidence <= 1, `Invalid topic confidence for ID ${id}.`);
+    assert(SENTIMENT_ORDER.includes(row.expected_sentiment) && SENTIMENT_ORDER.includes(row.predicted_sentiment), `Invalid sentiment label for ID ${id}.`);
+    assert(TOPIC_ORDER.includes(row.expected_topic) && TOPIC_ORDER.includes(row.predicted_topic), `Invalid topic label for ID ${id}.`);
+    assert(LEVELS.includes(row.linguistic_level), `Invalid linguistic level for ID ${id}.`);
+    assert(typeof row.sentiment_correct === "boolean" && typeof row.topic_correct === "boolean", `Invalid correctness flags for ID ${id}.`);
+    assert(row.sentiment_correct === (row.expected_sentiment === row.predicted_sentiment), `Sentiment correctness mismatch for ID ${id}.`);
+    assert(row.topic_correct === (row.expected_topic === row.predicted_topic), `Topic correctness mismatch for ID ${id}.`);
+    return {
+      id, text: String(row.text),
+      expected_sentiment: row.expected_sentiment, predicted_sentiment: row.predicted_sentiment,
+      sentiment_confidence: sentimentConfidence, sentiment_correct: row.sentiment_correct,
+      expected_topic: row.expected_topic, predicted_topic: row.predicted_topic,
+      topic_confidence: topicConfidence, topic_correct: row.topic_correct,
+      linguistic_level: row.linguistic_level, flagprofanity: Number(row.flagprofanity),
+      goldtest: Number(row.goldtest), both_correct: row.sentiment_correct && row.topic_correct,
+    };
+  }
 
-    const ids = rows.map((row) => Number(row.ID));
-    assert(ids.every(Number.isInteger), "predictions.csv contains an invalid ID.");
-    assert(ids.length === new Set(ids).size, "predictions.csv contains duplicate IDs.");
+  function buildDashboardData(analysis, contract, runId, urls) {
+    assert(analysis.schema_version === contract.schema_version, `Unsupported analysis schema: ${analysis.schema_version}.`);
+    requireFields(analysis.run, contract.required_run_fields, "analysis.run");
+    assert(analysis.run.status === contract.required_status, "The latest run is not complete.");
+    assert(analysis.run.run_id === runId, "latest.json and analysis.json disagree on run_id.");
+    for (const [field, expected] of Object.entries(contract.required_scope)) {
+      assert(analysis.scope && analysis.scope[field] === expected, `Unexpected analysis scope for ${field}.`);
+    }
+    validateTask(analysis.tasks.sentiment, "sentiment", contract);
+    validateTask(analysis.tasks.topic, "topic", contract);
+    assert(Array.isArray(analysis.reviews) && analysis.reviews.length, "analysis.json contains no review-level results.");
 
-    const reviews = rows.map((row) => {
-      const id = Number(row.ID);
-      const sentimentConfidence = Number(row.sentiment_confidence);
-      const topicConfidence = Number(row.topic_confidence);
-      assert(Number.isFinite(sentimentConfidence) && sentimentConfidence >= 0 && sentimentConfidence <= 1, `Invalid sentiment confidence for ID ${id}.`);
-      assert(Number.isFinite(topicConfidence) && topicConfidence >= 0 && topicConfidence <= 1, `Invalid topic confidence for ID ${id}.`);
-      assert(SENTIMENT_ORDER.includes(row.expected_sentiment) && SENTIMENT_ORDER.includes(row.predicted_sentiment), `Invalid sentiment label for ID ${id}.`);
-      assert(TOPIC_ORDER.includes(row.expected_topic) && TOPIC_ORDER.includes(row.predicted_topic), `Invalid topic label for ID ${id}.`);
-      assert(LEVELS.includes(row.linguistic_level), `Invalid linguistic level for ID ${id}.`);
-      const sentimentCorrect = parseBool(row.sentiment_correct, "sentiment_correct", id);
-      const topicCorrect = parseBool(row.topic_correct, "topic_correct", id);
-      assert(sentimentCorrect === (row.expected_sentiment === row.predicted_sentiment), `Sentiment correctness mismatch for ID ${id}.`);
-      assert(topicCorrect === (row.expected_topic === row.predicted_topic), `Topic correctness mismatch for ID ${id}.`);
-      return {
-        id, text: row.text,
-        expected_sentiment: row.expected_sentiment, predicted_sentiment: row.predicted_sentiment,
-        sentiment_confidence: sentimentConfidence, sentiment_correct: sentimentCorrect,
-        expected_topic: row.expected_topic, predicted_topic: row.predicted_topic,
-        topic_confidence: topicConfidence, topic_correct: topicCorrect,
-        linguistic_level: row.linguistic_level,
-        flagprofanity: parseBinary(row.flagprofanity, "flagprofanity", id),
-        goldtest: parseBinary(row.goldtest, "goldtest", id),
-        both_correct: sentimentCorrect && topicCorrect,
-      };
-    });
-
+    const reviews = analysis.reviews.map(normalizeReview);
+    const ids = reviews.map((row) => row.id);
+    assert(ids.length === new Set(ids).size, "analysis.json contains duplicate review IDs.");
     const sentiment = taskSummary(reviews, "sentiment", SENTIMENT_ORDER);
     const topic = taskSummary(reviews, "topic", TOPIC_ORDER);
-    assert(Math.abs(sentiment.accuracy - Number(metricData.sentiment.metrics.accuracy)) < 1e-9, "Sentiment accuracy disagrees with metrics.json.");
-    assert(Math.abs(topic.accuracy - Number(metricData.topic.metrics.accuracy)) < 1e-9, "Topic accuracy disagrees with metrics.json.");
+    assert(Math.abs(sentiment.accuracy - Number(analysis.tasks.sentiment.metrics.accuracy)) < 1e-9, "Sentiment accuracy disagrees with analysis.json task metrics.");
+    assert(Math.abs(topic.accuracy - Number(analysis.tasks.topic.metrics.accuracy)) < 1e-9, "Topic accuracy disagrees with analysis.json task metrics.");
     const jointCorrect = reviews.filter((review) => review.both_correct).length;
     return {
-      metadata: { ...manifest, loaded_at: new Date().toISOString(), source_urls: urls },
+      metadata: { ...analysis.run, scope: analysis.scope, loaded_at: new Date().toISOString(), source_urls: urls },
       kpis: {
-        incoming_reviews: reviews.length,
-        sentiment_accuracy: sentiment.accuracy,
-        topic_accuracy: topic.accuracy,
-        joint_accuracy: ratio(jointCorrect, reviews.length),
-        joint_correct: jointCorrect,
+        incoming_reviews: reviews.length, sentiment_accuracy: sentiment.accuracy, topic_accuracy: topic.accuracy,
+        joint_accuracy: ratio(jointCorrect, reviews.length), joint_correct: jointCorrect,
         goldtest_count: reviews.filter((review) => review.goldtest === 1).length,
-        profanity_count: reviews.filter((review) => review.flagprofanity === 1).length,
       },
-      sentiment, topic, metrics: metricData, reviews,
+      sentiment, topic, metrics: analysis.tasks, reviews,
     };
   }
 
   async function loadLiveDataAttempt() {
+    const contract = await fetchJson(CONTRACT_URL, "default");
     const cacheKey = Date.now();
-    const latest = await fetchJson(`${OUTPUT_ROOT}/latest.json?live=${cacheKey}`);
+    const latest = await fetchJson(`${contract.source_root}/${contract.latest_file}?live=${cacheKey}`, "no-store");
+    requireFields(latest, contract.required_latest_fields, contract.latest_file);
     assert(typeof latest.run_id === "string" && /^[A-Za-z0-9._-]+$/.test(latest.run_id), "latest.json contains an invalid run ID.");
     const runId = latest.run_id;
-    const root = `${OUTPUT_ROOT}/${encodeURIComponent(runId)}`;
+    const root = `${contract.source_root}/${encodeURIComponent(runId)}`;
     const urls = {
       runId,
-      predictions: `${root}/predictions.csv?live=${cacheKey}`,
-      metrics: `${root}/metrics.json?live=${cacheKey}`,
-      manifest: `${root}/run_manifest.json?live=${cacheKey}`,
-      browser: `${OUTPUT_BROWSER_ROOT}/${encodeURIComponent(runId)}`,
+      analysis: `${root}/${contract.analysis_file}`,
+      paper: `${root}/${contract.paper_file}`,
+      browser: `${contract.browser_root}/${encodeURIComponent(runId)}`,
     };
-    const [manifest, predictions, metrics] = await Promise.all([
-      fetchJson(urls.manifest), fetchText(urls.predictions), fetchJson(urls.metrics),
-    ]);
-    return buildDashboardData(manifest, parseCsv(predictions), metrics, urls);
+    const analysis = await fetchJson(urls.analysis, "force-cache");
+    return buildDashboardData(analysis, contract, runId, urls);
   }
 
   async function loadLiveData() {
@@ -232,6 +200,11 @@
     throw lastError;
   }
 
+  function ciText(taskData) {
+    const ci = taskData.uncertainty.accuracy_ci95;
+    return `95% CI ${percent(ci.low)}–${percent(ci.high)}`;
+  }
+
   function renderMetadata(data) {
     const { metadata, kpis, sentiment, topic } = data;
     setText("run-id", metadata.run_id);
@@ -240,15 +213,15 @@
     setText("kpi-topic", percent(kpis.topic_accuracy));
     setText("kpi-joint", percent(kpis.joint_accuracy));
     setText("kpi-reviews", number(kpis.incoming_reviews));
-    setText("kpi-sentiment-detail", `${number(sentiment.correct)} of ${number(kpis.incoming_reviews)} correct`);
-    setText("kpi-topic-detail", `${number(topic.correct)} of ${number(kpis.incoming_reviews)} correct`);
-    setText("kpi-joint-detail", `${number(kpis.joint_correct)} of ${number(kpis.incoming_reviews)} reviews`);
+    setText("kpi-sentiment-detail", `${number(sentiment.correct)} / ${number(kpis.incoming_reviews)} ${copy.correct} · ${ciText(data.metrics.sentiment)}`);
+    setText("kpi-topic-detail", `${number(topic.correct)} / ${number(kpis.incoming_reviews)} ${copy.correct} · ${ciText(data.metrics.topic)}`);
+    setText("kpi-joint-detail", `${number(kpis.joint_correct)} / ${number(kpis.incoming_reviews)} ${copy.reviews}`);
     setText("data-review-count", number(kpis.incoming_reviews));
-    setText("source-freshness", `Live from ${metadata.run_id} · generation ${metadata.input_generation} · model executed ${formatTimestamp(metadata.model_timestamp)} · loaded ${formatTimestamp(metadata.loaded_at)}`);
+    setText("source-freshness", `Run ${metadata.run_id} · generation ${metadata.input_generation} · ${formatTimestamp(metadata.model_timestamp)}`);
     const status = byId("live-status");
     status.className = "status-complete";
-    status.innerHTML = '<i aria-hidden="true"></i> Live';
-    byId("download-results").href = metadata.source_urls.predictions;
+    status.innerHTML = `<i aria-hidden="true"></i> ${copy.live}`;
+    byId("download-results").href = metadata.source_urls.paper;
     byId("source-run-link").href = metadata.source_urls.browser;
     setText("method-meta", `Pipeline ${metadata.pipeline_version} · Generation ${metadata.input_generation} · Seed ${metadata.parameters.seed} · ${metadata.parameters.epochs} epochs · TensorFlow ${metadata.tensorflow_version}`);
   }
@@ -257,11 +230,11 @@
     const sentimentDelta = Number(data.metrics.sentiment.metric_delta_vs_baseline.accuracy);
     const topicDelta = Number(data.metrics.topic.metric_delta_vs_baseline.accuracy);
     const baselineWinsBoth = sentimentDelta < 0 && topicDelta < 0;
-    setText("finding-title", baselineWinsBoth ? "The linear baseline currently generalizes better than the LSTM." : "The LSTM and linear baseline show task-dependent tradeoffs.");
-    setText(
-      "finding-body",
-      `On the same incoming batch, sentiment accuracy is ${percent(data.metrics.sentiment.metrics.accuracy)} for the LSTM versus ${percent(data.metrics.sentiment.baseline_metrics.accuracy)} for TF-IDF + Logistic Regression (${points(sentimentDelta)}). Topic accuracy is ${percent(data.metrics.topic.metrics.accuracy)} versus ${percent(data.metrics.topic.baseline_metrics.accuracy)} (${points(topicDelta)}). ${number(data.kpis.goldtest_count)} reviews are goldtest candidates for the next training generation.`
-    );
+    setText("finding-title", baselineWinsBoth ? copy.baselineTitle : copy.tradeoffTitle);
+    const sentence = IS_PT
+      ? `No mesmo lote de entrada sintético, a acurácia de sentimento é ${percent(data.metrics.sentiment.metrics.accuracy)} para a LSTM e ${percent(data.metrics.sentiment.baseline_metrics.accuracy)} para TF-IDF + Regressão Logística (${points(sentimentDelta)}). Para tópico, os valores são ${percent(data.metrics.topic.metrics.accuracy)} e ${percent(data.metrics.topic.baseline_metrics.accuracy)} (${points(topicDelta)}). Estes números não constituem validação externa.`
+      : `On the same synthetic incoming batch, sentiment accuracy is ${percent(data.metrics.sentiment.metrics.accuracy)} for the LSTM versus ${percent(data.metrics.sentiment.baseline_metrics.accuracy)} for TF-IDF + Logistic Regression (${points(sentimentDelta)}). Topic accuracy is ${percent(data.metrics.topic.metrics.accuracy)} versus ${percent(data.metrics.topic.baseline_metrics.accuracy)} (${points(topicDelta)}). These values are not external validation.`;
+    setText("finding-body", sentence);
   }
 
   function createBarRow(name, value, alert) {
@@ -295,7 +268,7 @@
   function renderMatrix(data) {
     const { labels, matrix } = data.sentiment.confusion;
     const maxValue = Math.max(...labels.flatMap((a) => labels.map((b) => matrix[a][b])));
-    const table = document.createElement("table"); table.className = "matrix-table"; table.setAttribute("aria-label", "Sentiment confusion matrix");
+    const table = document.createElement("table"); table.className = "matrix-table"; table.setAttribute("aria-label", IS_PT ? "Matriz de confusão de sentimento" : "Sentiment confusion matrix");
     const thead = document.createElement("thead"), heading = document.createElement("tr");
     heading.appendChild(document.createElement("th"));
     labels.forEach((predicted) => { const th = document.createElement("th"); th.scope = "col"; th.textContent = label(predicted); heading.appendChild(th); });
@@ -306,9 +279,9 @@
       labels.forEach((predicted) => {
         const value = matrix[expected][predicted];
         const td = document.createElement("td"); td.className = `matrix-cell ${expected === predicted ? "is-diagonal" : "is-error"}`;
-        td.style.setProperty("--matrix-opacity", String(value === 0 ? 0.04 : 0.14 + (value / maxValue) * 0.46));
+        td.style.setProperty("--matrix-opacity", String(value === 0 ? 0.04 : 0.14 + (value / Math.max(1, maxValue)) * 0.46));
         td.textContent = number(value);
-        const hint = document.createElement("small"); hint.textContent = expected === predicted ? "correct" : value ? "error" : "none"; td.appendChild(hint); tr.appendChild(td);
+        const hint = document.createElement("small"); hint.textContent = expected === predicted ? copy.correctHint : value ? copy.errorHint : copy.noneHint; td.appendChild(hint); tr.appendChild(td);
       });
       tbody.appendChild(tr);
     });
@@ -320,7 +293,7 @@
       const card = document.createElement("div"); card.className = "topic-card";
       const title = document.createElement("p"); title.className = "topic-card-label"; title.textContent = label(name);
       const score = document.createElement("strong"); score.textContent = percent(data.topic.class_accuracy[name]);
-      const volume = document.createElement("span"); volume.textContent = `${number(data.topic.expected_distribution[name])} incoming reviews`;
+      const volume = document.createElement("span"); volume.textContent = `${number(data.topic.expected_distribution[name])} ${copy.incomingReviews}`;
       card.append(title, score, volume); return card;
     });
     byId("topic-chart").replaceChildren(...cards);
@@ -328,7 +301,7 @@
 
   function renderDistribution(data) {
     const labels = data.sentiment.confusion.labels;
-    const maximum = Math.max(...labels.flatMap((name) => [data.sentiment.expected_distribution[name], data.sentiment.predicted_distribution[name]]));
+    const maximum = Math.max(1, ...labels.flatMap((name) => [data.sentiment.expected_distribution[name], data.sentiment.predicted_distribution[name]]));
     const columns = labels.map((name) => {
       const wrapper = document.createElement("div"); wrapper.className = "grouped-column";
       const expected = document.createElement("div"); expected.className = "vertical-bar expected"; expected.style.height = `${(data.sentiment.expected_distribution[name] / maximum) * 100}%`;
@@ -345,21 +318,21 @@
     const card = document.createElement("div"); card.className = `confidence-card ${className}`;
     const title = document.createElement("p"); title.textContent = name;
     const value = document.createElement("strong"); value.textContent = percent(confidence);
-    const comparison = document.createElement("span"); comparison.textContent = `${percent(accuracyValue)} accuracy`;
+    const comparison = document.createElement("span"); comparison.textContent = `${percent(accuracyValue)} ${IS_PT ? "acurácia" : "accuracy"}`;
     card.append(title, value, comparison); return card;
   }
 
   function renderConfidence(data) {
     byId("confidence-comparison").replaceChildren(
-      confidenceCard("Sentiment", data.sentiment.average_confidence, data.sentiment.accuracy, "is-warning"),
-      confidenceCard("Topic", data.topic.average_confidence, data.topic.accuracy, "is-strong")
+      confidenceCard(IS_PT ? "Sentimento" : "Sentiment", data.sentiment.average_confidence, data.sentiment.accuracy, "is-warning"),
+      confidenceCard(IS_PT ? "Tópico" : "Topic", data.topic.average_confidence, data.topic.accuracy, "is-strong")
     );
   }
 
   function predictionCell(predicted, expected, confidence) {
     const cell = document.createElement("td"), wrapper = document.createElement("div"); wrapper.className = "prediction-cell";
     const predictedElement = document.createElement("strong"); predictedElement.textContent = label(predicted);
-    const detail = document.createElement("span"); detail.textContent = predicted === expected ? `${percent(confidence)} confidence` : `Expected ${label(expected)} · ${percent(confidence)} confidence`;
+    const detail = document.createElement("span"); detail.textContent = predicted === expected ? `${percent(confidence)} ${copy.confidence}` : `${copy.expected} ${label(expected)} · ${percent(confidence)} ${copy.confidence}`;
     wrapper.append(predictedElement, detail); cell.appendChild(wrapper); return cell;
   }
 
@@ -371,21 +344,21 @@
     const start = (state.page - 1) * PAGE_SIZE;
     const rows = state.filtered.slice(start, start + PAGE_SIZE);
     if (!rows.length) {
-      const tr = document.createElement("tr"), td = document.createElement("td"); td.className = "empty-cell"; td.colSpan = 5; td.textContent = "No reviews match the selected filters."; tr.appendChild(td); body.replaceChildren(tr);
+      const tr = document.createElement("tr"), td = document.createElement("td"); td.className = "empty-cell"; td.colSpan = 5; td.textContent = copy.noResults; tr.appendChild(td); body.replaceChildren(tr);
     } else {
       body.replaceChildren(...rows.map((review) => {
         const tr = document.createElement("tr"), idCell = document.createElement("td"), textCell = document.createElement("td"), resultCell = document.createElement("td");
         idCell.textContent = review.id; textCell.textContent = review.text;
         const result = document.createElement("span"); result.className = `result-pill ${review.both_correct ? "correct" : "error"}`;
-        result.textContent = review.both_correct ? "Both correct" : (!review.sentiment_correct && !review.topic_correct ? "Two errors" : review.sentiment_correct ? "Topic error" : "Sentiment error");
+        result.textContent = review.both_correct ? copy.bothCorrect : (!review.sentiment_correct && !review.topic_correct ? copy.twoErrors : review.sentiment_correct ? copy.topicError : copy.sentimentError);
         resultCell.appendChild(result);
         tr.append(idCell, textCell, predictionCell(review.predicted_sentiment, review.expected_sentiment, review.sentiment_confidence), predictionCell(review.predicted_topic, review.expected_topic, review.topic_confidence), resultCell);
         return tr;
       }));
     }
     const shownFrom = total ? start + 1 : 0, shownTo = Math.min(start + PAGE_SIZE, total);
-    setText("review-count", `Showing ${number(shownFrom)}–${number(shownTo)} of ${number(total)} reviews`);
-    setText("page-status", `Page ${state.page} of ${pageCount}`);
+    setText("review-count", `${copy.showing} ${number(shownFrom)}–${number(shownTo)} / ${number(total)} ${copy.reviews}`);
+    setText("page-status", `${copy.page} ${state.page} ${copy.of} ${pageCount}`);
     byId("previous-page").disabled = state.page <= 1;
     byId("next-page").disabled = state.page >= pageCount;
   }
@@ -417,16 +390,16 @@
   }
 
   function showError(error) {
-    const message = document.createElement("p"); message.className = "dashboard-load-error";
-    message.textContent = "Live model results could not be loaded or did not pass validation. No cached result is being shown. Please refresh the page or open the source files.";
+    const message = document.createElement("p"); message.className = "dashboard-load-error"; message.textContent = copy.sourceError;
     const hero = document.querySelector(".dashboard-hero"); if (hero) hero.insertAdjacentElement("afterend", message);
     const tableBody = byId("review-table-body");
-    if (tableBody) { const tr = document.createElement("tr"), td = document.createElement("td"); td.className = "empty-cell"; td.colSpan = 5; td.textContent = "Results unavailable."; tr.appendChild(td); tableBody.replaceChildren(tr); }
-    const status = byId("live-status"); if (status) { status.className = "status-error"; status.innerHTML = '<i aria-hidden="true"></i> Data unavailable'; }
-    setText("source-freshness", "The live source could not be validated.");
+    if (tableBody) { const tr = document.createElement("tr"), td = document.createElement("td"); td.className = "empty-cell"; td.colSpan = 5; td.textContent = copy.unavailable; tr.appendChild(td); tableBody.replaceChildren(tr); }
+    const status = byId("live-status"); if (status) { status.className = "status-error"; status.innerHTML = `<i aria-hidden="true"></i> ${copy.unavailable}`; }
+    setText("source-freshness", copy.sourceInvalid);
     document.documentElement.dataset.dashboardError = "true";
     console.error(error);
   }
 
+  setText("method-meta", copy.loading);
   loadLiveData().then(render).catch(showError);
 })();
