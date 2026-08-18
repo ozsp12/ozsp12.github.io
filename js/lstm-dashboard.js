@@ -64,23 +64,13 @@
 
   async function fetchJson(url, cache = "default") {
     const response = await fetch(url, { cache });
-    if (!response.ok) {
-      const error = new Error(`Data request failed (${response.status}): ${url}`);
-      error.status = response.status;
-      throw error;
-    }
+    if (!response.ok) throw new Error(`Data request failed (${response.status}): ${url}`);
     return response.json();
   }
 
   async function fetchRunDocument(root, contract) {
     const runUrl = `${root}/${contract.run_file}`;
-    try {
-      return { document: await fetchJson(runUrl, "force-cache"), url: runUrl, file: contract.run_file, legacy: false };
-    } catch (error) {
-      if (error.status !== 404 || !contract.legacy_analysis_file) throw error;
-      const legacyUrl = `${root}/${contract.legacy_analysis_file}`;
-      return { document: await fetchJson(legacyUrl, "force-cache"), url: legacyUrl, file: contract.legacy_analysis_file, legacy: true };
-    }
+    return { document: await fetchJson(runUrl, "force-cache"), url: runUrl, file: contract.run_file };
   }
 
   function countBy(rows, field, labels) {
@@ -155,11 +145,8 @@
   }
 
   function buildDashboardData(runDocument, contract, runId, source) {
-    const validSchema = runDocument.schema_version === contract.schema_version || runDocument.schema_version === contract.legacy_schema_version;
-    assert(validSchema, `Unsupported run schema: ${runDocument.schema_version}.`);
-    if (runDocument.schema_version === contract.schema_version) {
-      assert(runDocument.artifact_type === "experiment_run", "run.json has an invalid artifact type.");
-    }
+    assert(runDocument.schema_version === contract.schema_version, `Unsupported run schema: ${runDocument.schema_version}.`);
+    assert(runDocument.artifact_type === "experiment_run", "run.json has an invalid artifact type.");
     requireFields(runDocument.run, contract.required_run_fields, "run.run");
     assert(runDocument.run.status === contract.required_status, "The latest run is not complete.");
     assert(runDocument.run.run_id === runId, `latest.json and ${source.file} disagree on run_id.`);
@@ -259,7 +246,7 @@
     setText("finding-title", sentimentDelta < 0 && topicDelta < 0 ? copy.baselineTitle : copy.tradeoffTitle);
     const body = IS_PT
       ? `No lote sintético atual, a acurácia de sentimento é ${percent(data.metrics.sentiment.metrics.accuracy)} para a LSTM e ${percent(data.metrics.sentiment.baseline_metrics.accuracy)} para TF-IDF + Regressão Logística (${points(sentimentDelta)}). Para tópico, os valores são ${percent(data.metrics.topic.metrics.accuracy)} e ${percent(data.metrics.topic.baseline_metrics.accuracy)} (${points(topicDelta)}). Estes números não constituem validação externa.`
-      : `On the current synthetic batch, sentiment accuracy is ${percent(data.metrics.sentiment.metrics.accuracy)} for the LSTM versus ${percent(data.metrics.sentiment.baseline_metrics.accuracy)} for TF-IDF + Logistic Regression (${points(sentimentDelta)}). Topic accuracy is ${percent(data.metrics.topic.metrics.accuracy)} versus ${percent(data.metrics.topic.baseline_metrics.accuracy)} (${points(topicDelta)}). These values are not external validation.`;
+      : `On the current synthetic batch, sentiment accuracy is ${percent(data.metrics.sentiment.metrics.accuracy)} for the LSTM versus ${percent(data.metrics.sentiment.baseline_metrics.accuracy)} for TF-IDF + Logistic Regression (${points(sentimentDelta)}). Topic accuracy is ${percent(data.metrics.topic.metrics.accuracy)} versus ${percent(data.metrics.topic.baseline_metrics.accuracy)} for TF-IDF + Logistic Regression (${points(topicDelta)}). These values are not external validation.`;
     setText("finding-body", body);
   }
 
