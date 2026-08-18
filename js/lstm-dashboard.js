@@ -15,7 +15,7 @@
     page: "Página", of: "de", showing: "Exibindo", bothCorrect: "Ambos corretos", twoErrors: "Dois erros",
     topicError: "Erro de tópico", sentimentError: "Erro de sentimento", expected: "Esperado", confidence: "confiança",
     incomingReviews: "avaliações de entrada", correctHint: "correto", errorHint: "erro", noneHint: "nenhum",
-    batchTitle: "Comparação no lote sintético atual", baselineTitle: "O baseline linear supera a LSTM no lote sintético atual.",
+    baselineTitle: "O baseline linear supera a LSTM no lote sintético atual.",
     tradeoffTitle: "LSTM e baseline linear apresentam diferenças dependentes da tarefa no lote sintético atual.",
     sourceError: "Os resultados do modelo não puderam ser carregados ou não passaram pela validação. Nenhum resultado em cache foi exibido.",
     sourceInvalid: "A fonte ao vivo não pôde ser validada.",
@@ -25,18 +25,18 @@
     page: "Page", of: "of", showing: "Showing", bothCorrect: "Both correct", twoErrors: "Two errors",
     topicError: "Topic error", sentimentError: "Sentiment error", expected: "Expected", confidence: "confidence",
     incomingReviews: "incoming reviews", correctHint: "correct", errorHint: "error", noneHint: "none",
-    batchTitle: "Comparison on the current synthetic batch", baselineTitle: "The linear baseline outperforms the LSTM on the current synthetic batch.",
+    baselineTitle: "The linear baseline outperforms the LSTM on the current synthetic batch.",
     tradeoffTitle: "The LSTM and linear baseline show task-dependent differences on the current synthetic batch.",
     sourceError: "Live model results could not be loaded or did not pass validation. No cached result is being shown.",
     sourceInvalid: "The live source could not be validated.",
   };
 
   const byId = (id) => document.getElementById(id);
+  const ratio = (a, b) => b ? a / b : 0;
   const number = (value) => new Intl.NumberFormat(IS_PT ? "pt-BR" : "en-US").format(Number(value));
   const percent = (value, digits = 1) => `${(Number(value) * 100).toFixed(digits)}%`;
   const points = (value, digits = 1) => `${Number(value) >= 0 ? "+" : ""}${(Number(value) * 100).toFixed(digits)} pp`;
-  const label = (value) => String(value).replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  const ratio = (a, b) => b ? a / b : 0;
+  const label = (value) => String(value).replaceAll("_", " ").replace(/\b\w/g, (char) => char.toUpperCase());
 
   function setText(id, value) {
     const element = byId(id);
@@ -64,8 +64,23 @@
 
   async function fetchJson(url, cache = "default") {
     const response = await fetch(url, { cache });
-    if (!response.ok) throw new Error(`Data request failed (${response.status}): ${url}`);
+    if (!response.ok) {
+      const error = new Error(`Data request failed (${response.status}): ${url}`);
+      error.status = response.status;
+      throw error;
+    }
     return response.json();
+  }
+
+  async function fetchRunDocument(root, contract) {
+    const runUrl = `${root}/${contract.run_file}`;
+    try {
+      return { document: await fetchJson(runUrl, "force-cache"), url: runUrl, file: contract.run_file, legacy: false };
+    } catch (error) {
+      if (error.status !== 404 || !contract.legacy_analysis_file) throw error;
+      const legacyUrl = `${root}/${contract.legacy_analysis_file}`;
+      return { document: await fetchJson(legacyUrl, "force-cache"), url: legacyUrl, file: contract.legacy_analysis_file, legacy: true };
+    }
   }
 
   function countBy(rows, field, labels) {
@@ -102,7 +117,7 @@
   }
 
   function validateTask(taskData, task, contract) {
-    requireFields(taskData, contract.required_task_fields, `analysis.tasks.${task}`);
+    requireFields(taskData, contract.required_task_fields, `run.tasks.${task}`);
     for (const group of ["metrics", "baseline_metrics", "metric_delta_vs_baseline"]) {
       assert(taskData[group] && typeof taskData[group] === "object", `Missing ${task}.${group}.`);
     }
@@ -117,9 +132,9 @@
 
   function normalizeReview(row) {
     const id = Number(row.ID);
-    assert(Number.isInteger(id), `Invalid review ID: ${row.ID}.`);
     const sentimentConfidence = Number(row.sentiment_confidence);
     const topicConfidence = Number(row.topic_confidence);
+    assert(Number.isInteger(id), `Invalid review ID: ${row.ID}.`);
     assert(Number.isFinite(sentimentConfidence) && sentimentConfidence >= 0 && sentimentConfidence <= 1, `Invalid sentiment confidence for ID ${id}.`);
     assert(Number.isFinite(topicConfidence) && topicConfidence >= 0 && topicConfidence <= 1, `Invalid topic confidence for ID ${id}.`);
     assert(SENTIMENT_ORDER.includes(row.expected_sentiment) && SENTIMENT_ORDER.includes(row.predicted_sentiment), `Invalid sentiment label for ID ${id}.`);
@@ -139,34 +154,48 @@
     };
   }
 
-  function buildDashboardData(analysis, contract, runId, urls) {
-    assert(analysis.schema_version === contract.schema_version, `Unsupported analysis schema: ${analysis.schema_version}.`);
-    requireFields(analysis.run, contract.required_run_fields, "analysis.run");
-    assert(analysis.run.status === contract.required_status, "The latest run is not complete.");
-    assert(analysis.run.run_id === runId, "latest.json and analysis.json disagree on run_id.");
-    for (const [field, expected] of Object.entries(contract.required_scope)) {
-      assert(analysis.scope && analysis.scope[field] === expected, `Unexpected analysis scope for ${field}.`);
+  function buildDashboardData(runDocument, contract, runId, source) {
+    const validSchema = runDocument.schema_version === contract.schema_version || runDocument.schema_version === contract.legacy_schema_version;
+    assert(validSchema, `Unsupported run schema: ${runDocument.schema_version}.`);
+    if (runDocument.schema_version === contract.schema_version) {
+      assert(runDocument.artifact_type === "experiment_run", "run.json has an invalid artifact type.");
     }
-    validateTask(analysis.tasks.sentiment, "sentiment", contract);
-    validateTask(analysis.tasks.topic, "topic", contract);
-    assert(Array.isArray(analysis.reviews) && analysis.reviews.length, "analysis.json contains no review-level results.");
+    requireFields(runDocument.run, contract.required_run_fields, "run.run");
+    assert(runDocument.run.status === contract.required_status, "The latest run is not complete.");
+    assert(runDocument.run.run_id === runId, `latest.json and ${source.file} disagree on run_id.`);
+    for (const [field, expected] of Object.entries(contract.required_scope)) {
+      assert(runDocument.scope && runDocument.scope[field] === expected, `Unexpected run scope for ${field}.`);
+    }
+    validateTask(runDocument.tasks.sentiment, "sentiment", contract);
+    validateTask(runDocument.tasks.topic, "topic", contract);
+    assert(Array.isArray(runDocument.reviews) && runDocument.reviews.length, `${source.file} contains no review-level results.`);
 
-    const reviews = analysis.reviews.map(normalizeReview);
+    const reviews = runDocument.reviews.map(normalizeReview);
     const ids = reviews.map((row) => row.id);
-    assert(ids.length === new Set(ids).size, "analysis.json contains duplicate review IDs.");
+    assert(ids.length === new Set(ids).size, `${source.file} contains duplicate review IDs.`);
     const sentiment = taskSummary(reviews, "sentiment", SENTIMENT_ORDER);
     const topic = taskSummary(reviews, "topic", TOPIC_ORDER);
-    assert(Math.abs(sentiment.accuracy - Number(analysis.tasks.sentiment.metrics.accuracy)) < 1e-9, "Sentiment accuracy disagrees with analysis.json task metrics.");
-    assert(Math.abs(topic.accuracy - Number(analysis.tasks.topic.metrics.accuracy)) < 1e-9, "Topic accuracy disagrees with analysis.json task metrics.");
+    assert(Math.abs(sentiment.accuracy - Number(runDocument.tasks.sentiment.metrics.accuracy)) < 1e-9, `Sentiment accuracy disagrees with ${source.file}.`);
+    assert(Math.abs(topic.accuracy - Number(runDocument.tasks.topic.metrics.accuracy)) < 1e-9, `Topic accuracy disagrees with ${source.file}.`);
     const jointCorrect = reviews.filter((review) => review.both_correct).length;
     return {
-      metadata: { ...analysis.run, scope: analysis.scope, loaded_at: new Date().toISOString(), source_urls: urls },
+      metadata: {
+        ...runDocument.run,
+        scope: runDocument.scope,
+        schema_version: runDocument.schema_version,
+        benchmark: runDocument.benchmark || null,
+        loaded_at: new Date().toISOString(),
+        source_urls: source,
+      },
       kpis: {
-        incoming_reviews: reviews.length, sentiment_accuracy: sentiment.accuracy, topic_accuracy: topic.accuracy,
-        joint_accuracy: ratio(jointCorrect, reviews.length), joint_correct: jointCorrect,
+        incoming_reviews: reviews.length,
+        sentiment_accuracy: sentiment.accuracy,
+        topic_accuracy: topic.accuracy,
+        joint_accuracy: ratio(jointCorrect, reviews.length),
+        joint_correct: jointCorrect,
         goldtest_count: reviews.filter((review) => review.goldtest === 1).length,
       },
-      sentiment, topic, metrics: analysis.tasks, reviews,
+      sentiment, topic, metrics: runDocument.tasks, reviews,
     };
   }
 
@@ -178,21 +207,18 @@
     assert(typeof latest.run_id === "string" && /^[A-Za-z0-9._-]+$/.test(latest.run_id), "latest.json contains an invalid run ID.");
     const runId = latest.run_id;
     const root = `${contract.source_root}/${encodeURIComponent(runId)}`;
-    const urls = {
-      runId,
-      analysis: `${root}/${contract.analysis_file}`,
-      paper: `${root}/${contract.paper_file}`,
-      browser: `${contract.browser_root}/${encodeURIComponent(runId)}`,
-    };
-    const analysis = await fetchJson(urls.analysis, "force-cache");
-    return buildDashboardData(analysis, contract, runId, urls);
+    const source = await fetchRunDocument(root, contract);
+    source.runId = runId;
+    source.browser = `${contract.browser_root}/${encodeURIComponent(runId)}`;
+    return buildDashboardData(source.document, contract, runId, source);
   }
 
   async function loadLiveData() {
     let lastError;
     for (let attempt = 0; attempt < 3; attempt += 1) {
-      try { return await loadLiveDataAttempt(); }
-      catch (error) {
+      try {
+        return await loadLiveDataAttempt();
+      } catch (error) {
         lastError = error;
         if (attempt < 2) await new Promise((resolve) => window.setTimeout(resolve, 750 * (attempt + 1)));
       }
@@ -217,24 +243,24 @@
     setText("kpi-topic-detail", `${number(topic.correct)} / ${number(kpis.incoming_reviews)} ${copy.correct} · ${ciText(data.metrics.topic)}`);
     setText("kpi-joint-detail", `${number(kpis.joint_correct)} / ${number(kpis.incoming_reviews)} ${copy.reviews}`);
     setText("data-review-count", number(kpis.incoming_reviews));
-    setText("source-freshness", `Run ${metadata.run_id} · generation ${metadata.input_generation} · ${formatTimestamp(metadata.model_timestamp)}`);
+    setText("source-freshness", `Run ${metadata.run_id} · generation ${metadata.input_generation} · ${formatTimestamp(metadata.model_timestamp)} · ${metadata.source_urls.file}`);
     const status = byId("live-status");
     status.className = "status-complete";
     status.innerHTML = `<i aria-hidden="true"></i> ${copy.live}`;
-    byId("download-results").href = metadata.source_urls.paper;
+    byId("download-results").href = metadata.source_urls.url;
     byId("source-run-link").href = metadata.source_urls.browser;
-    setText("method-meta", `Pipeline ${metadata.pipeline_version} · Generation ${metadata.input_generation} · Seed ${metadata.parameters.seed} · ${metadata.parameters.epochs} epochs · TensorFlow ${metadata.tensorflow_version}`);
+    const seeds = Array.isArray(metadata.parameters.replicate_seeds) ? metadata.parameters.replicate_seeds : [metadata.parameters.seed];
+    setText("method-meta", `Pipeline ${metadata.pipeline_version} · Generation ${metadata.input_generation} · Seeds ${seeds.join(", ")} · ${metadata.parameters.epochs} epochs · TensorFlow ${metadata.tensorflow_version}`);
   }
 
   function renderFinding(data) {
     const sentimentDelta = Number(data.metrics.sentiment.metric_delta_vs_baseline.accuracy);
     const topicDelta = Number(data.metrics.topic.metric_delta_vs_baseline.accuracy);
-    const baselineWinsBoth = sentimentDelta < 0 && topicDelta < 0;
-    setText("finding-title", baselineWinsBoth ? copy.baselineTitle : copy.tradeoffTitle);
-    const sentence = IS_PT
-      ? `No mesmo lote de entrada sintético, a acurácia de sentimento é ${percent(data.metrics.sentiment.metrics.accuracy)} para a LSTM e ${percent(data.metrics.sentiment.baseline_metrics.accuracy)} para TF-IDF + Regressão Logística (${points(sentimentDelta)}). Para tópico, os valores são ${percent(data.metrics.topic.metrics.accuracy)} e ${percent(data.metrics.topic.baseline_metrics.accuracy)} (${points(topicDelta)}). Estes números não constituem validação externa.`
-      : `On the same synthetic incoming batch, sentiment accuracy is ${percent(data.metrics.sentiment.metrics.accuracy)} for the LSTM versus ${percent(data.metrics.sentiment.baseline_metrics.accuracy)} for TF-IDF + Logistic Regression (${points(sentimentDelta)}). Topic accuracy is ${percent(data.metrics.topic.metrics.accuracy)} versus ${percent(data.metrics.topic.baseline_metrics.accuracy)} (${points(topicDelta)}). These values are not external validation.`;
-    setText("finding-body", sentence);
+    setText("finding-title", sentimentDelta < 0 && topicDelta < 0 ? copy.baselineTitle : copy.tradeoffTitle);
+    const body = IS_PT
+      ? `No lote sintético atual, a acurácia de sentimento é ${percent(data.metrics.sentiment.metrics.accuracy)} para a LSTM e ${percent(data.metrics.sentiment.baseline_metrics.accuracy)} para TF-IDF + Regressão Logística (${points(sentimentDelta)}). Para tópico, os valores são ${percent(data.metrics.topic.metrics.accuracy)} e ${percent(data.metrics.topic.baseline_metrics.accuracy)} (${points(topicDelta)}). Estes números não constituem validação externa.`
+      : `On the current synthetic batch, sentiment accuracy is ${percent(data.metrics.sentiment.metrics.accuracy)} for the LSTM versus ${percent(data.metrics.sentiment.baseline_metrics.accuracy)} for TF-IDF + Logistic Regression (${points(sentimentDelta)}). Topic accuracy is ${percent(data.metrics.topic.metrics.accuracy)} versus ${percent(data.metrics.topic.baseline_metrics.accuracy)} (${points(topicDelta)}). These values are not external validation.`;
+    setText("finding-body", body);
   }
 
   function createBarRow(name, value, alert) {
@@ -243,7 +269,8 @@
     const track = document.createElement("div"); track.className = "bar-track"; track.setAttribute("aria-hidden", "true");
     const fill = document.createElement("div"); fill.className = `bar-fill${alert ? " is-alert" : ""}`; fill.style.width = `${Math.max(0, Math.min(100, value * 100))}%`; track.appendChild(fill);
     const valueElement = document.createElement("div"); valueElement.className = "bar-value"; valueElement.textContent = percent(value);
-    row.append(nameElement, track, valueElement); return row;
+    row.append(nameElement, track, valueElement);
+    return row;
   }
 
   function renderBarChart(id, rows) {
@@ -337,8 +364,7 @@
   }
 
   function renderReviews() {
-    const body = byId("review-table-body");
-    const total = state.filtered.length;
+    const body = byId("review-table-body"), total = state.filtered.length;
     const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
     state.page = Math.min(state.page, pageCount);
     const start = (state.page - 1) * PAGE_SIZE;
@@ -385,7 +411,8 @@
 
   function render(data) {
     state.data = data; state.filtered = data.reviews.slice();
-    renderMetadata(data); renderFinding(data); renderModelAccuracy(data); renderSentimentClasses(data); renderMatrix(data); renderTopics(data); renderDistribution(data); renderConfidence(data); renderReviews(); bindControls();
+    renderMetadata(data); renderFinding(data); renderModelAccuracy(data); renderSentimentClasses(data);
+    renderMatrix(data); renderTopics(data); renderDistribution(data); renderConfidence(data); renderReviews(); bindControls();
     document.documentElement.dataset.dashboardReady = "true";
   }
 
