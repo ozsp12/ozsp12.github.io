@@ -25,8 +25,9 @@ requireMatch(script.includes("contract.source_root"), "dashboard must derive sou
 requireMatch(script.includes("latest_file}?live="), "dashboard must resolve latest.json on every load");
 requireMatch(script.includes('"no-store"'), "latest.json must bypass browser cache");
 requireMatch(script.includes('"force-cache"'), "immutable run artifacts should be cacheable");
-requireMatch(script.includes("contract.run_file"), "dashboard must prefer run.json");
-requireMatch(script.includes("contract.legacy_analysis_file"), "dashboard must retain temporary legacy-read compatibility");
+requireMatch(script.includes("contract.run_file"), "dashboard must load run.json");
+requireMatch(!script.includes("legacy_analysis_file"), "dashboard must not retain legacy analysis fallback");
+requireMatch(!script.includes("analysis.json"), "dashboard must not reference analysis.json");
 for (const obsolete of ["predictions.csv", "metrics.json", "results.json", "run_manifest.json", "dashboard-data.json", "article_analysis.csv"]) {
   requireMatch(!script.includes(obsolete), `dashboard must not reference obsolete ${obsolete}`);
 }
@@ -38,9 +39,9 @@ requireMatch(script.includes("external validation"), "dashboard must communicate
 requireMatch(script.includes("attempt < 3"), "dashboard must retry short-lived propagation failures");
 requireMatch(contract.run_file === "run.json", "integration contract must declare run.json");
 requireMatch(contract.schema_version === "2.0.0", "integration contract must declare run schema 2.0.0");
-requireMatch(contract.legacy_analysis_file === "analysis.json", "migration contract must identify the legacy analysis filename");
-requireMatch(contract.legacy_schema_version === "1.0.0", "migration contract must identify legacy schema 1.0.0");
-requireMatch(contract.analysis_file === undefined, "integration contract must not present analysis.json as the canonical file");
+requireMatch(contract.legacy_analysis_file === undefined, "integration contract must not retain legacy analysis fields");
+requireMatch(contract.legacy_schema_version === undefined, "integration contract must not retain a legacy schema");
+requireMatch(contract.analysis_file === undefined, "integration contract must not present analysis.json as canonical");
 requireMatch(contract.paper_file === undefined, "integration contract must not expose a redundant paper-specific artifact");
 requireMatch(!html.includes("Pipeline 0.5.0"), "dashboard must not contain stale pipeline metadata");
 requireMatch(html.includes("Open run JSON"), "dashboard must expose the canonical run artifact");
@@ -52,4 +53,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`  - ${failure}`));
   process.exit(1);
 }
-console.log("LSTM dashboard validation passed: run.json contract, legacy migration, caching, uncertainty, and limitations are wired correctly.");
+console.log("LSTM dashboard validation passed: canonical run.json, caching, uncertainty, and limitations are wired correctly.");
