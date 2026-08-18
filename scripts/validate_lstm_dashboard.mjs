@@ -24,25 +24,32 @@ requireMatch(!script.includes("raw.githubusercontent.com/ozsp12/lstm_for_the_win
 requireMatch(script.includes("contract.source_root"), "dashboard must derive source URLs from the contract");
 requireMatch(script.includes("latest_file}?live="), "dashboard must resolve latest.json on every load");
 requireMatch(script.includes('"no-store"'), "latest.json must bypass browser cache");
-requireMatch(script.includes('"force-cache"'), "immutable analysis.json should be cacheable");
-requireMatch(script.includes("contract.analysis_file"), "dashboard must fetch analysis.json");
-for (const obsolete of ["predictions.csv", "metrics.json", "results.json", "run_manifest.json", "dashboard-data.json"]) {
+requireMatch(script.includes('"force-cache"'), "immutable run artifacts should be cacheable");
+requireMatch(script.includes("contract.run_file"), "dashboard must prefer run.json");
+requireMatch(script.includes("contract.legacy_analysis_file"), "dashboard must retain temporary legacy-read compatibility");
+for (const obsolete of ["predictions.csv", "metrics.json", "results.json", "run_manifest.json", "dashboard-data.json", "article_analysis.csv"]) {
   requireMatch(!script.includes(obsolete), `dashboard must not reference obsolete ${obsolete}`);
 }
-requireMatch(script.includes("analysis.schema_version === contract.schema_version"), "dashboard must validate the analysis schema");
+requireMatch(script.includes('runDocument.artifact_type === "experiment_run"'), "dashboard must validate the canonical artifact type");
 requireMatch(script.includes("duplicate review IDs"), "dashboard must validate unique IDs");
-requireMatch(script.includes("accuracy disagrees with analysis.json"), "dashboard must reconcile review-derived accuracy");
+requireMatch(script.includes("accuracy disagrees with"), "dashboard must reconcile review-derived accuracy");
 requireMatch(script.includes("accuracy_ci95"), "dashboard must validate and display 95% accuracy intervals");
 requireMatch(script.includes("external validation"), "dashboard must communicate the synthetic benchmark limitation");
 requireMatch(script.includes("attempt < 3"), "dashboard must retry short-lived propagation failures");
-requireMatch(contract.run_files === undefined, "integration contract must not retain the old multi-file run contract");
-requireMatch(contract.analysis_file === "analysis.json", "integration contract must declare analysis.json");
+requireMatch(contract.run_file === "run.json", "integration contract must declare run.json");
+requireMatch(contract.schema_version === "2.0.0", "integration contract must declare run schema 2.0.0");
+requireMatch(contract.legacy_analysis_file === "analysis.json", "migration contract must identify the legacy analysis filename");
+requireMatch(contract.legacy_schema_version === "1.0.0", "migration contract must identify legacy schema 1.0.0");
+requireMatch(contract.analysis_file === undefined, "integration contract must not present analysis.json as the canonical file");
+requireMatch(contract.paper_file === undefined, "integration contract must not expose a redundant paper-specific artifact");
 requireMatch(!html.includes("Pipeline 0.5.0"), "dashboard must not contain stale pipeline metadata");
+requireMatch(html.includes("Open run JSON"), "dashboard must expose the canonical run artifact");
 requireMatch(html.includes("No real external dataset is evaluated here"), "dashboard must state the absence of external validation");
+requireMatch(html.includes("any later CSV or Parquet views are derived directly"), "dashboard must describe tabular outputs as derived views");
 
 if (failures.length) {
   console.error(`LSTM dashboard validation failed with ${failures.length} error(s):`);
   failures.forEach((failure) => console.error(`  - ${failure}`));
   process.exit(1);
 }
-console.log("LSTM dashboard validation passed: canonical analysis.json contract, caching, uncertainty, and limitations are wired correctly.");
+console.log("LSTM dashboard validation passed: run.json contract, legacy migration, caching, uncertainty, and limitations are wired correctly.");
