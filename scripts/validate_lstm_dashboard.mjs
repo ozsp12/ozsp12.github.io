@@ -35,7 +35,7 @@ requireMatch(script.includes('runDocument.artifact_type === "experiment_run"'), 
 requireMatch(script.includes("duplicate review IDs"), "dashboard must validate unique IDs");
 requireMatch(script.includes("accuracy disagrees with"), "dashboard must reconcile review-derived accuracy");
 requireMatch(script.includes("accuracy_ci95"), "dashboard must validate and display 95% accuracy intervals");
-requireMatch(script.includes("external validation"), "dashboard must communicate the synthetic benchmark limitation");
+requireMatch(script.includes("external validation"), "dashboard must communicate the evaluation-scope limitation");
 requireMatch(script.includes("attempt < 3"), "dashboard must retry short-lived propagation failures");
 requireMatch(contract.run_file === "run.json", "integration contract must declare run.json");
 requireMatch(contract.schema_version === "2.0.0", "integration contract must declare run schema 2.0.0");
@@ -45,7 +45,10 @@ requireMatch(contract.analysis_file === undefined, "integration contract must no
 requireMatch(contract.paper_file === undefined, "integration contract must not expose a redundant paper-specific artifact");
 requireMatch(!html.includes("Pipeline 0.5.0"), "dashboard must not contain stale pipeline metadata");
 requireMatch(html.includes("Open run JSON"), "dashboard must expose the canonical run artifact");
-requireMatch(html.includes("No real external dataset is evaluated here"), "dashboard must state the absence of external validation");
+requireMatch(html.includes("UCI Sentiment Labelled Sentences Amazon subset"), "dashboard must identify the external sentiment benchmark");
+requireMatch(html.includes("applies to sentiment only"), "dashboard must limit the external-validation claim to sentiment");
+requireMatch(html.includes("does not establish external topic generalization or full three-class sentiment coverage"), "dashboard must state external-validation limitations");
+requireMatch(!html.includes("No real external dataset is evaluated here"), "dashboard must not retain the obsolete no-external-data statement");
 requireMatch(html.includes("any later CSV or Parquet views are derived directly"), "dashboard must describe tabular outputs as derived views");
 
 if (failures.length) {
@@ -53,4 +56,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`  - ${failure}`));
   process.exit(1);
 }
-console.log("LSTM dashboard validation passed: canonical run.json, caching, uncertainty, and limitations are wired correctly.");
+console.log("LSTM dashboard validation passed: canonical run.json, caching, uncertainty, and external-sentiment scope are wired correctly.");
