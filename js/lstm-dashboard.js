@@ -108,15 +108,16 @@
 
   function validateTask(taskData, task, contract) {
     requireFields(taskData, contract.required_task_fields, `run.tasks.${task}`);
-    for (const group of ["metrics", "baseline_metrics", "metric_delta_vs_baseline"]) {
+    for (const group of ["metrics", "baseline_metrics", "metric_delta_vs_baseline", "primary_seed_metrics"]) {
       assert(taskData[group] && typeof taskData[group] === "object", `Missing ${task}.${group}.`);
     }
     for (const key of ["accuracy", "macro_f1", "weighted_f1", "log_loss", "brier_score"]) {
       assert(Number.isFinite(Number(taskData.metrics[key])), `Invalid ${task} LSTM ${key}.`);
+      assert(Number.isFinite(Number(taskData.primary_seed_metrics[key])), `Invalid ${task} primary-seed LSTM ${key}.`);
       assert(Number.isFinite(Number(taskData.baseline_metrics[key])), `Invalid ${task} baseline ${key}.`);
     }
-    const ci = taskData.uncertainty && taskData.uncertainty.accuracy_ci95;
-    assert(ci && ci.method === "wilson", `Missing ${task} 95% Wilson accuracy interval.`);
+    const ci = taskData.uncertainty && taskData.uncertainty.primary_seed_accuracy_ci95;
+    assert(ci && ci.method === "wilson", `Missing ${task} primary-seed 95% Wilson accuracy interval.`);
     assert(Number(ci.low) >= 0 && Number(ci.high) <= 1 && Number(ci.low) <= Number(ci.high), `Invalid ${task} confidence interval.`);
   }
 
@@ -162,8 +163,8 @@
     assert(ids.length === new Set(ids).size, `${source.file} contains duplicate review IDs.`);
     const sentiment = taskSummary(reviews, "sentiment", SENTIMENT_ORDER);
     const topic = taskSummary(reviews, "topic", TOPIC_ORDER);
-    assert(Math.abs(sentiment.accuracy - Number(runDocument.tasks.sentiment.metrics.accuracy)) < 1e-9, `Sentiment accuracy disagrees with ${source.file}.`);
-    assert(Math.abs(topic.accuracy - Number(runDocument.tasks.topic.metrics.accuracy)) < 1e-9, `Topic accuracy disagrees with ${source.file}.`);
+    assert(Math.abs(sentiment.accuracy - Number(runDocument.tasks.sentiment.primary_seed_metrics.accuracy)) < 1e-9, `Sentiment accuracy disagrees with ${source.file}.`);
+    assert(Math.abs(topic.accuracy - Number(runDocument.tasks.topic.primary_seed_metrics.accuracy)) < 1e-9, `Topic accuracy disagrees with ${source.file}.`);
     const jointCorrect = reviews.filter((review) => review.both_correct).length;
     return {
       metadata: {
@@ -214,7 +215,7 @@
   }
 
   function ciText(taskData) {
-    const ci = taskData.uncertainty.accuracy_ci95;
+    const ci = taskData.uncertainty.primary_seed_accuracy_ci95;
     return `95% CI ${percent(ci.low)}–${percent(ci.high)}`;
   }
 
