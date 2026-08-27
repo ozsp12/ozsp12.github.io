@@ -1,7 +1,7 @@
 {
   "name": "lstm_for_the_win",
-  "source_root": "https://raw.githubusercontent.com/ozsp12/lstm_for_the_win/main/data/output",
-  "browser_root": "https://github.com/ozsp12/lstm_for_the_win/tree/main/data/output",
+  "source_root": "https://raw.githubusercontent.com/ozsp12/project_lstm_for_the_win/main/data/output",
+  "browser_root": "https://github.com/ozsp12/project_lstm_for_the_win/tree/main/data/output",
   "latest_file": "latest.json",
   "run_file": "run.json",
   "schema_version": "2.0.0",
