@@ -64,18 +64,3 @@ document.addEventListener('DOMContentLoaded', function () {
     desktopQuery.addListener(handleViewportChange);
   }
 });
-
-
-document.addEventListener('DOMContentLoaded', function () {
-  var footer = document.querySelector('.site-footer');
-  if (!footer || footer.querySelector('.footer-links')) return;
-  var isPortuguese = (document.documentElement.lang || '').toLowerCase().indexOf('pt') === 0;
-  var links = document.createElement('ul');
-  links.className = 'footer-links';
-  links.setAttribute('aria-label', isPortuguese ? 'Links institucionais' : 'Institutional links');
-  links.innerHTML =
-    '<li><a href="https://orcid.org/0000-0003-2231-517X" rel="noopener noreferrer" target="_blank">ORCID</a></li>' +
-    '<li><a href="https://github.com/ozsp12" rel="noopener noreferrer" target="_blank">GitHub</a></li>' +
-    '<li><a href="mailto:olsp@if.ufrj.br">' + (isPortuguese ? 'Contato institucional' : 'Institutional contact') + '</a></li>';
-  footer.insertBefore(links, footer.firstChild);
-});
