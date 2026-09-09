@@ -397,3 +397,15 @@ main { display: block; }
   .home-visual-pathways-inner { padding: 0 20px; grid-template-columns: minmax(0,1fr); gap: 16px; }
   .home-visual-image img { aspect-ratio: 2.5 / 1; }
 }
+
+.footer-reference-inner { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: minmax(220px,1fr) minmax(280px,1.2fr) auto; gap: 28px; align-items: end; text-align: left; }
+.footer-identity { display: grid; gap: 3px; }
+.footer-identity strong { font-family: var(--serif); font-size: 14px; font-weight: 600; color: var(--text); }
+.footer-identity span { font-size: 11.5px; line-height: 1.45; color: var(--text-muted); }
+.footer-copy { text-align: center; }
+.footer-reference-inner .footer-links { justify-content: flex-end; margin: 0; align-self: center; }
+@media (max-width: 760px) {
+  .footer-reference-inner { grid-template-columns: minmax(0,1fr); gap: 12px; text-align: center; }
+  .footer-copy { text-align: center; }
+  .footer-reference-inner .footer-links { justify-content: center; }
+}
