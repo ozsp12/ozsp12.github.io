@@ -40,13 +40,11 @@ PAGE_PATHS = {
 
 NAVIGATION = (
     ("home", {"pt": "Início", "en": "Home"}),
-    ("about", {"pt": "Sobre", "en": "About"}),
-    ("teaching", {"pt": "Notas", "en": "Notes"}),
     ("research", {"pt": "Pesquisa", "en": "Research"}),
-    ("publications", {"pt": "Publicações", "en": "Papers"}),
-    ("physlab", {"pt": "PhysLab", "en": "PhysLab"}),
     ("projects", {"pt": "Projetos", "en": "Projects"}),
-    ("contact", {"pt": "Contato", "en": "Contact"}),
+    ("publications", {"pt": "Publicações", "en": "Publications"}),
+    ("teaching", {"pt": "Ensino", "en": "Teaching"}),
+    ("about", {"pt": "Sobre", "en": "About"}),
 )
 
 NAV_PARENT = {
