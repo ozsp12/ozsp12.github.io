@@ -40,11 +40,16 @@ ESSENTIAL_FILES = [
     "css/lstm-dashboard.css",
     "js/navigation.js",
     "js/lstm-dashboard.js",
-    "assets/research-gravitation.jpg",
-    "assets/research-complex-systems.jpg",
-    "assets/research-ai-data.jpg",
-    "assets/research-mathematics.jpg",
-    "assets/research-broader-interests.jpg",
+    "assets/warp_drive.png",
+    "assets/general_relativity.png",
+    "assets/cosmology.png",
+    "assets/complex_system.png",
+    "assets/topology.png",
+    "assets/cosmo_quantum_2.png",
+    "assets/cosmos_quantum.png",
+    "assets/quantum.png",
+    "assets/quantum_computing.png",
+    "assets/black_hole.png",
     "assets/project-lstm.jpg",
 ]
 
@@ -350,7 +355,7 @@ class Validation:
 
             if rel_posix == "en/projects/lstm_ftw/index.html":
                 expected_current = "/en/projects/"
-            elif rel_posix.endswith("/repos/index.html"):
+            elif rel_posix.endswith(("/repos/index.html", "/contact/index.html")):
                 expected_current = f"/{language}/about/"
             else:
                 expected_current = self.expected_nav_href(relative, language)
