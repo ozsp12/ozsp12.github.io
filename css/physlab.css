@@ -164,3 +164,12 @@
     -webkit-line-clamp: 2;
   }
 }
+
+.projects-page { max-width: 860px; }
+.projects-page .physlab-list { margin-top: 26px; }
+.projects-page .physlab-project { grid-template-columns: 145px minmax(0, 1fr); gap: 20px; padding: 20px 0; }
+.project-fact { margin: 0 0 5px; font-family: var(--sans); font-size: 13.5px; line-height: 1.5; color: var(--text-muted); }
+.project-fact strong { color: var(--text); font-weight: 600; }
+.projects-page .physlab-project-links { margin-top: 9px; }
+@media (max-width: 640px) { .projects-page .physlab-project { grid-template-columns: 115px minmax(0, 1fr); gap: 14px; } }
+@media (max-width: 480px) { .projects-page .physlab-project { grid-template-columns: minmax(0, 1fr); } .projects-page .physlab-thumb-link, .projects-page .project-thumb-card { width: 150px; } }
