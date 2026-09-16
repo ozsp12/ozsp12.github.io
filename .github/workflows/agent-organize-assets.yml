@@ -44,9 +44,9 @@ jobs:
                   continue
               updated = text
               for name in cinematic:
-                  updated = updated.replace(f'/assets/{name}', f'/assets/cinematic/{name}')
-              updated = updated.replace('/assets/project-lstm.jpg', '/assets/minimalist/project-lstm.jpg')
-              updated = updated.replace('/assets/research-complex-systems.jpg', '/assets/cinematic/complex_system2.png')
+                  updated = updated.replace(f'assets/{name}', f'assets/cinematic/{name}')
+              updated = updated.replace('assets/project-lstm.jpg', 'assets/minimalist/project-lstm.jpg')
+              updated = updated.replace('assets/research-complex-systems.jpg', 'assets/cinematic/complex_system2.png')
               if updated != text:
                   path.write_text(updated, encoding='utf-8')
 
@@ -68,6 +68,11 @@ jobs:
               raise SystemExit('Home featured stylesheet hook not found in build_site.py')
           build.write_text(text.replace(old, ''), encoding='utf-8')
 
+          validator = root / 'scripts/validate_site.py'
+          text = validator.read_text(encoding='utf-8')
+          text = re.sub(r'^\s*["\']css/home-featured\.css["\'],?\s*\n', '', text, flags=re.MULTILINE)
+          validator.write_text(text, encoding='utf-8')
+
           css = root / 'css/home-featured.css'
           if css.exists():
               css.unlink()
@@ -76,7 +81,7 @@ jobs:
         run: python scripts/build_site.py
       - name: Verify obsolete asset paths are gone
         run: |
-          if grep -R -nE '/assets/(artificial_intelligence|black_hole|complex_system|complex_system2|cosmo_quantum_2|cosmology|cosmos_quantum|general_relativity|notag1|notag2|quantum|quantum_computing|topology|warp_drive)\.png|/assets/project-lstm\.jpg|/assets/research-complex-systems\.jpg' templates scripts index.html en pt README.md 2>/dev/null; then
+          if grep -R -nE 'assets/(artificial_intelligence|black_hole|complex_system|complex_system2|cosmo_quantum_2|cosmology|cosmos_quantum|general_relativity|notag1|notag2|quantum|quantum_computing|topology|warp_drive)\.png|assets/project-lstm\.jpg|assets/research-complex-systems\.jpg' templates scripts index.html en pt README.md 2>/dev/null; then
             echo 'Obsolete asset reference found.'
             exit 1
           fi
