@@ -36,7 +36,7 @@ jobs:
           ]
           text_suffixes = {'.html', '.py', '.md', '.json', '.css', '.js', '.xml', '.txt', '.yml', '.yaml'}
           for path in root.rglob('*'):
-              if not path.is_file() or '.git' in path.parts or path.suffix.lower() not in text_suffixes:
+              if not path.is_file() or '.git' in path.parts or '.github' in path.parts or path.suffix.lower() not in text_suffixes:
                   continue
               try:
                   text = path.read_text(encoding='utf-8')
