@@ -356,7 +356,7 @@ main { display: block; }
 .hero-reference .hero-photo-wrap { width: 285px; }
 .hero-reference .hero-photo { border-radius: 4px; aspect-ratio: 1 / 1.04; }
 .hero-reference-copy { padding-top: 2px; min-width: 0; }
-.hero-headline { margin: 0 0 10px; max-width: 560px; font-family: var(--serif); font-size: clamp(26px, 2.3vw, 34px); line-height: 1.12; font-weight: 500; letter-spacing: -0.018em; color: var(--text); }
+.hero-headline { margin: 0 0 10px; max-width: 530px; font-family: var(--serif); font-size: clamp(22px, 1.9vw, 29px); line-height: 1.16; font-weight: 500; letter-spacing: -0.012em; color: var(--text); }
 .hero-person-name { margin: 0 0 7px; font-family: var(--serif); font-size: 24px; line-height: 1.25; font-weight: 650; color: var(--text); }
 .hero-reference .affiliation-line { margin: 0 0 14px; font-size: 13px; color: var(--text-muted); }
 .hero-reference .bio { max-width: 670px; }
@@ -397,7 +397,7 @@ main { display: block; }
   .hero-reference { padding: 28px 0 26px; }
   .hero-reference-inner { padding: 0 20px; grid-template-columns: minmax(0,1fr); gap: 22px; }
   .hero-reference .hero-photo-wrap { width: min(260px,100%); }
-  .hero-headline { font-size: clamp(25px, 7vw, 30px); max-width: 540px; }
+  .hero-headline { font-size: clamp(22px, 6vw, 27px); max-width: 520px; }
   .hero-person-name { font-size: 23px; }
   .hero-profile-links { grid-template-columns: minmax(0,1fr); }
   .hero-link-group + .hero-link-group { padding: 16px 0 0; border-left: 0; border-top: 1px solid var(--border); }
