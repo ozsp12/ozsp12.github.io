@@ -260,8 +260,6 @@ def render_page(lang: str, key: str) -> str:
         extra_style_links.append('<link href="/css/physlab.css?v=2" rel="stylesheet"/>')
     if key == "research":
         extra_style_links.append('<link href="/css/research.css?v=1" rel="stylesheet"/>')
-    if key == "home":
-        extra_style_links.append('<link href="/css/home-featured.css?v=1" rel="stylesheet"/>')
     extra_styles = "\n".join(extra_style_links)
     return replace_tokens(
         read(TEMPLATES / "base.html"),
