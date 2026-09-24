@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Radial geodesics in a spherically symmetric spacetime | Blog</title>
+<meta content="Demonstration post with Markdown, images, and LaTeX equations on radial geodesics in a spherically symmetric metric." name="description"/>
+<link href="https://ozsp12.github.io/en/blog/radial-geodesics/" rel="canonical"/>
+<link href="https://ozsp12.github.io/pt/blog/exemplo-geodesicas/" hreflang="pt" rel="alternate"/>
+<link href="https://ozsp12.github.io/en/blog/radial-geodesics/" hreflang="en" rel="alternate"/>
+<link href="https://ozsp12.github.io/en/blog/radial-geodesics/" hreflang="x-default" rel="alternate"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&amp;family=Public+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="/css/styles.css" rel="stylesheet"/>
+<link href="/css/blog.css" rel="stylesheet"/>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header class="site-header">
+<div class="header-inner"><a class="wordmark" href="/en/">Dr. Osvaldo L. Santos-Pereira</a>
+<nav aria-label="Main navigation" class="site-nav"><a class="nav-link" href="/en/">Home</a><a class="nav-link" href="/en/research/">Research</a><a class="nav-link" href="/en/projects/">Projects</a><a class="nav-link" href="/en/publications/">Publications</a><a class="nav-link" href="/en/teaching/">Teaching</a><a class="nav-link" href="/en/physlab/">PhysLab</a><a aria-current="page" class="nav-link active" href="/en/blog/">Blog</a><a class="nav-link" href="/en/about/">About</a><span class="lang-divider"></span><div class="lang-switch"><a aria-current="false" class="lang-btn" href="/pt/blog/exemplo-geodesicas/">PT</a><span class="lang-sep">|</span><a aria-current="true" class="lang-btn active" href="/en/blog/radial-geodesics/">EN</a></div></nav>
+<button aria-controls="mobile-navigation" aria-expanded="false" aria-label="Open menu" class="hamburger" data-menu-toggle="" type="button"><span></span><span></span><span></span></button></div>
+<nav aria-label="Mobile navigation" class="mobile-nav-panel" data-mobile-nav="" hidden id="mobile-navigation"><a class="nav-link" href="/en/">Home</a><a class="nav-link" href="/en/research/">Research</a><a class="nav-link" href="/en/projects/">Projects</a><a class="nav-link" href="/en/publications/">Publications</a><a class="nav-link" href="/en/teaching/">Teaching</a><a class="nav-link" href="/en/physlab/">PhysLab</a><a aria-current="page" class="nav-link active" href="/en/blog/">Blog</a><a class="nav-link" href="/en/about/">About</a><div class="mobile-lang-row"><a class="lang-btn" href="/pt/blog/exemplo-geodesicas/">PT</a><span class="lang-sep">|</span><a class="lang-btn active" href="/en/blog/radial-geodesics/">EN</a></div></nav>
+</header>
+<main id="main-content">
+<article class="article-shell">
+<header class="article-header">
+<p class="article-kicker">Scientific note</p>
+<h1 class="article-title">Radial geodesics in a spherically symmetric spacetime</h1>
+<p class="article-deck">A test of scientific publishing on the site using Markdown as source, versioned images, and LaTeX equations.</p>
+<p class="article-meta">Osvaldo L. Santos-Pereira · <time datetime="2026-09-24">24 September 2026</time> · 4 min read</p>
+<p class="article-tags">Physics · General Relativity · Notes</p>
+</header>
+<div class="article-body">
+<p>This is a demonstration post for testing a scientific blog area on the site. The proposal is to keep the source text in Markdown inside the repository and render mathematics in the browser with MathJax, without changing the current static architecture.</p>
+<figure><img alt="Representation of curved spacetime" src="/assets/cinematic/general_relativity.png"/><figcaption>Figure 1. Curved-spacetime illustration already stored among the website assets.</figcaption></figure>
+<h2>1. Metric and radial motion</h2>
+<p>Consider a static and spherically symmetric geometry written as</p>
+<div class="math-display">\[ds^2=-A(r)\,dt^2+B(r)\,dr^2+r^2d\Omega^2,\]</div>
+<p>where the angular line element is</p>
+<div class="math-display">\[d\Omega^2=d\theta^2+\sin^2\theta\,d\phi^2.\]</div>
+<p>For purely radial motion, \(d\theta=d\phi=0\). A convenient geodesic Lagrangian is therefore</p>
+<div class="math-display">\[\mathcal{L}=\frac{1}{2}\left[-A(r)\dot t^2+B(r)\dot r^2\right].\]</div>
+<h2>2. Constant of motion</h2>
+<p>Because the Lagrangian has no explicit dependence on \(t\), this coordinate is cyclic. The corresponding canonical momentum is conserved:</p>
+<div class="math-display">\[p_t=\frac{\partial\mathcal{L}}{\partial\dot t}=-A(r)\dot t=-E.\]</div>
+<p>Hence,</p>
+<div class="math-display">\[\dot t=\frac{E}{A(r)}.\]</div>
+<p>For a massive particle parametrized by proper time, normalization of the four-velocity gives</p>
+<div class="math-display">\[-1=-A(r)\dot t^2+B(r)\dot r^2,\]</div>
+<p>and after substituting the constant of motion we obtain</p>
+<div class="math-display">\[B(r)\dot r^2=\frac{E^2}{A(r)}-1.\]</div>
+<p>This expression already reduces the radial dynamics to a first-order equation. The example is intentionally short: the purpose is to verify typography, responsive layout, images, bilingual navigation, and mathematical rendering.</p>
+<figure><img alt="Illustration of a compact gravitational object" src="/assets/cinematic/black_hole.png"/><figcaption>Figure 2. A second image tests figure composition inside a long-form post.</figcaption></figure>
+<h2>3. Editorial workflow</h2>
+<p>The article has a Markdown source stored beside its rendered version. A post can therefore begin as a short note, grow in scope, and eventually migrate into a technical note or manuscript without losing its version history.</p>
+<div class="article-source">Post source: <a href="https://github.com/ozsp12/ozsp12.github.io/blob/main/en/blog/radial-geodesics/post.md">Markdown on GitHub</a>.</div>
+</div>
+</article>
+</main>
+<footer class="site-footer"><div class="footer-reference-inner"><div class="footer-identity"><strong>Dr. Osvaldo L. Santos-Pereira</strong><span>Institute of Physics · UFRJ · Rio de Janeiro, Brazil</span></div><div class="footer-copy"><p class="footer-line">© 2026 Dr. Osvaldo L. Santos-Pereira. All rights reserved.</p><p class="footer-tagline">Physics · Mathematics · Artificial Intelligence · Data Science</p></div><ul class="footer-links" aria-label="ORCID, GitHub, institutional contact"><li><a href="https://orcid.org/0000-0003-2231-517X" rel="noopener noreferrer" target="_blank">ORCID</a></li><li><a href="https://github.com/ozsp12" rel="noopener noreferrer" target="_blank">GitHub</a></li><li><a href="mailto:olsp@if.ufrj.br">Email</a></li></ul></div></footer>
+<script src="/js/navigation.js"></script>
+</body>
+</html>
