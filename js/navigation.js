@@ -1,5 +1,25 @@
 document.addEventListener('DOMContentLoaded', function () {
   var isPortuguese = (document.documentElement.lang || '').toLowerCase().indexOf('pt') === 0;
+  var blogHref = isPortuguese ? '/pt/blog/' : '/en/blog/';
+
+  function ensureBlogLink(nav) {
+    if (!nav || nav.querySelector('.nav-link[href="' + blogHref + '"]')) return;
+
+    var markup = '<a class="nav-link" href="' + blogHref + '">Blog</a>';
+    var physlabHref = isPortuguese ? '/pt/physlab/' : '/en/physlab/';
+    var aboutHref = isPortuguese ? '/pt/about/' : '/en/about/';
+    var physlab = nav.querySelector('.nav-link[href="' + physlabHref + '"]');
+    var about = nav.querySelector('.nav-link[href="' + aboutHref + '"]');
+
+    if (physlab) {
+      physlab.insertAdjacentHTML('afterend', markup);
+    } else if (about) {
+      about.insertAdjacentHTML('beforebegin', markup);
+    }
+  }
+
+  ensureBlogLink(document.querySelector('.site-nav'));
+  ensureBlogLink(document.querySelector('[data-mobile-nav]'));
 
   var toggle = document.querySelector('[data-menu-toggle]');
   var panel = document.querySelector('[data-mobile-nav]');
