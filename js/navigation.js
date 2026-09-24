@@ -1,31 +1,20 @@
 document.addEventListener('DOMContentLoaded', function () {
   var isPortuguese = (document.documentElement.lang || '').toLowerCase().indexOf('pt') === 0;
   var blogHref = isPortuguese ? '/pt/blog/' : '/en/blog/';
-  var blogLabel = 'Blog';
-  var onBlog = window.location.pathname.indexOf(blogHref) === 0;
 
   function ensureBlogLink(nav) {
     if (!nav || nav.querySelector('.nav-link[href="' + blogHref + '"]')) return;
 
-    var link = document.createElement('a');
-    link.className = 'nav-link';
-    link.href = blogHref;
-    link.textContent = blogLabel;
-
-    if (onBlog) {
-      link.classList.add('active');
-      link.setAttribute('aria-current', 'page');
-    }
-
-    var physlab = nav.querySelector('.nav-link[href="' + (isPortuguese ? '/pt/physlab/' : '/en/physlab/') + '"]');
-    var about = nav.querySelector('.nav-link[href="' + (isPortuguese ? '/pt/about/' : '/en/about/') + '"]');
+    var markup = '<a class="nav-link" href="' + blogHref + '">Blog</a>';
+    var physlabHref = isPortuguese ? '/pt/physlab/' : '/en/physlab/';
+    var aboutHref = isPortuguese ? '/pt/about/' : '/en/about/';
+    var physlab = nav.querySelector('.nav-link[href="' + physlabHref + '"]');
+    var about = nav.querySelector('.nav-link[href="' + aboutHref + '"]');
 
     if (physlab) {
-      physlab.insertAdjacentElement('afterend', link);
+      physlab.insertAdjacentHTML('afterend', markup);
     } else if (about) {
-      about.insertAdjacentElement('beforebegin', link);
-    } else {
-      nav.appendChild(link);
+      about.insertAdjacentHTML('beforebegin', markup);
     }
   }
 
