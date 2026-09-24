@@ -1,5 +1,36 @@
 document.addEventListener('DOMContentLoaded', function () {
   var isPortuguese = (document.documentElement.lang || '').toLowerCase().indexOf('pt') === 0;
+  var blogHref = isPortuguese ? '/pt/blog/' : '/en/blog/';
+  var blogLabel = 'Blog';
+  var onBlog = window.location.pathname.indexOf(blogHref) === 0;
+
+  function ensureBlogLink(nav) {
+    if (!nav || nav.querySelector('.nav-link[href="' + blogHref + '"]')) return;
+
+    var link = document.createElement('a');
+    link.className = 'nav-link';
+    link.href = blogHref;
+    link.textContent = blogLabel;
+
+    if (onBlog) {
+      link.classList.add('active');
+      link.setAttribute('aria-current', 'page');
+    }
+
+    var physlab = nav.querySelector('.nav-link[href="' + (isPortuguese ? '/pt/physlab/' : '/en/physlab/') + '"]');
+    var about = nav.querySelector('.nav-link[href="' + (isPortuguese ? '/pt/about/' : '/en/about/') + '"]');
+
+    if (physlab) {
+      physlab.insertAdjacentElement('afterend', link);
+    } else if (about) {
+      about.insertAdjacentElement('beforebegin', link);
+    } else {
+      nav.appendChild(link);
+    }
+  }
+
+  ensureBlogLink(document.querySelector('.site-nav'));
+  ensureBlogLink(document.querySelector('[data-mobile-nav]'));
 
   var toggle = document.querySelector('[data-menu-toggle]');
   var panel = document.querySelector('[data-mobile-nav]');
