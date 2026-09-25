@@ -3,7 +3,13 @@ document.addEventListener('DOMContentLoaded', function () {
   var blogHref = isPortuguese ? '/pt/blog/' : '/en/blog/';
 
   function ensureBlogLink(nav) {
-    if (!nav || nav.querySelector('.nav-link[href="' + blogHref + '"]')) return;
+    if (!nav) return;
+
+    var navLinks = nav.querySelectorAll('.nav-link');
+    for (var i = 0; i < navLinks.length; i += 1) {
+      var href = navLinks[i].getAttribute('href') || '';
+      if (href.indexOf(blogHref) === 0) return;
+    }
 
     var markup = '<a class="nav-link" href="' + blogHref + '">Blog</a>';
     var physlabHref = isPortuguese ? '/pt/physlab/' : '/en/physlab/';
