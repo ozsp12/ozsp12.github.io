@@ -2,8 +2,6 @@ name: Validate external integrations
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '17 09 * * *'
 
 permissions:
   contents: read
