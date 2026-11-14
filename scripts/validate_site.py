@@ -24,21 +24,12 @@ ESSENTIAL_FILES = [
     "en/research/index.html",
     "pt/publications/index.html",
     "en/publications/index.html",
-    "pt/physlab/index.html",
-    "en/physlab/index.html",
-    "pt/projects/index.html",
-    "en/projects/index.html",
     "pt/repos/index.html",
     "en/repos/index.html",
     "pt/contact/index.html",
     "en/contact/index.html",
-    "en/projects/lstm_ftw/index.html",
     "css/styles.css",
-    "css/physlab.css",
-    "css/research.css",
-    "css/lstm-dashboard.css",
     "js/navigation.js",
-    "js/lstm-dashboard.js",
     "assets/cinematic/warp_drive.png",
     "assets/cinematic/general_relativity.png",
     "assets/cinematic/cosmology.png",
@@ -49,10 +40,9 @@ ESSENTIAL_FILES = [
     "assets/cinematic/quantum.png",
     "assets/cinematic/quantum_computing.png",
     "assets/cinematic/black_hole.png",
-    "assets/minimalist/project-lstm.jpg",
 ]
 
-STANDALONE_EN_PAGES = {"projects/lstm_ftw/index.html"}
+STANDALONE_EN_PAGES = set()
 
 VOID_ELEMENTS = {
     "area", "base", "br", "col", "embed", "hr", "img", "input",
@@ -65,8 +55,6 @@ EXPECTED_PAGE_PATHS = {
     "teaching": "/teaching/",
     "research": "/research/",
     "publications": "/publications/",
-    "physlab": "/physlab/",
-    "projects": "/projects/",
     "repos": "/repos/",
     "contact": "/contact/",
 }
@@ -316,45 +304,16 @@ class Validation:
                 continue
 
             language = "pt" if rel_posix.startswith("pt/") else "en"
-            physlab_href = f"/{language}/physlab/"
-            projects_href = f"/{language}/projects/"
             repos_href = f"/{language}/repos/"
             nav_links = [
                 a for a in parser.anchors
                 if "nav-link" in a.get("class", "").split()
             ]
 
-            physlab_links = [a for a in nav_links if a.get("href") == physlab_href]
-            if len(physlab_links) != 2:
-                self.fail(
-                    f"{relative}: expected PhysLab in desktop and mobile navigation "
-                    f"(2 links), found {len(physlab_links)}"
-                )
-                continue
-
-            projects_links = [a for a in nav_links if a.get("href") == projects_href]
-            if len(projects_links) != 2:
-                self.fail(
-                    f"{relative}: expected Projects in desktop and mobile navigation "
-                    f"(2 links), found {len(projects_links)}"
-                )
-                continue
-
             if any(a.get("href") == repos_href for a in nav_links):
                 self.fail(f"{relative}: Code must remain outside primary navigation")
 
-            is_physlab = "/physlab/" in f"/{rel_posix}"
-            for link in physlab_links:
-                classes = link.get("class", "").split()
-                current = link.get("aria-current") == "page"
-                if is_physlab and ("active" not in classes or not current):
-                    self.fail(f"{relative}: PhysLab link must be active/current on PhysLab page")
-                if not is_physlab and ("active" in classes or current):
-                    self.fail(f"{relative}: PhysLab link must not be active/current off PhysLab page")
-
-            if rel_posix == "en/projects/lstm_ftw/index.html":
-                expected_current = "/en/projects/"
-            elif rel_posix.endswith(("/repos/index.html", "/contact/index.html")):
+            if rel_posix.endswith(("/repos/index.html", "/contact/index.html")):
                 expected_current = f"/{language}/about/"
             else:
                 expected_current = self.expected_nav_href(relative, language)
@@ -460,7 +419,7 @@ class Validation:
                 )
 
     def check_css_and_javascript_guards(self) -> None:
-        for css_path in (ROOT / "css/styles.css", ROOT / "css/lstm-dashboard.css", ROOT / "css/research.css", ROOT / "css/home-featured.css"):
+        for css_path in (ROOT / "css/styles.css", ROOT / "css/home-featured.css"):
             if not css_path.is_file():
                 continue
             css = css_path.read_text(encoding="utf-8")
