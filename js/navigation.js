@@ -1,6 +1,51 @@
 document.addEventListener('DOMContentLoaded', function () {
   var isPortuguese = (document.documentElement.lang || '').toLowerCase().indexOf('pt') === 0;
 
+  var themeButtons = document.querySelectorAll('[data-theme-toggle]');
+  var storedTheme = null;
+  try {
+    storedTheme = window.localStorage.getItem('site-theme');
+  } catch (error) {
+    storedTheme = null;
+  }
+
+  var systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var initialTheme = storedTheme === 'dark' || storedTheme === 'light'
+    ? storedTheme
+    : (systemPrefersDark ? 'dark' : 'light');
+
+  function applyTheme(theme) {
+    var isDark = theme === 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+    themeButtons.forEach(function (button) {
+      button.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+      button.setAttribute('aria-label', isPortuguese
+        ? (isDark ? 'Usar tema claro' : 'Usar tema escuro')
+        : (isDark ? 'Use light theme' : 'Use dark theme'));
+      var label = button.querySelector('.theme-btn-label');
+      if (label) {
+        label.textContent = isPortuguese
+          ? (isDark ? 'Claro' : 'Escuro')
+          : (isDark ? 'Light' : 'Dark');
+      }
+    });
+  }
+
+  applyTheme(initialTheme);
+
+  themeButtons.forEach(function (button) {
+    button.addEventListener('click', function () {
+      var current = document.documentElement.getAttribute('data-theme') || 'light';
+      var next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      try {
+        window.localStorage.setItem('site-theme', next);
+      } catch (error) {
+        // Theme still works for the current page when storage is unavailable.
+      }
+    });
+  });
+
   var toggle = document.querySelector('[data-menu-toggle]');
   var panel = document.querySelector('[data-mobile-nav]');
   if (!toggle || !panel) return;
