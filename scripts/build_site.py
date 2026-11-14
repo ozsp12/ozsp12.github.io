@@ -25,15 +25,13 @@ ROOT_OUTPUT = ROOT / "index.html"
 SITEMAP_OUTPUT = ROOT / "sitemap.xml"
 ROBOTS_OUTPUT = ROOT / "robots.txt"
 
-PAGE_KEYS = ("home", "about", "teaching", "research", "publications", "physlab", "projects", "repos", "contact")
+PAGE_KEYS = ("home", "about", "teaching", "research", "publications", "repos", "contact")
 PAGE_PATHS = {
     "home": "index.html",
     "about": "about/index.html",
     "teaching": "teaching/index.html",
     "research": "research/index.html",
     "publications": "publications/index.html",
-    "physlab": "physlab/index.html",
-    "projects": "projects/index.html",
     "repos": "repos/index.html",
     "contact": "contact/index.html",
 }
@@ -41,10 +39,8 @@ PAGE_PATHS = {
 NAVIGATION = (
     ("home", {"pt": "Início", "en": "Home"}),
     ("research", {"pt": "Pesquisa", "en": "Research"}),
-    ("projects", {"pt": "Projetos", "en": "Projects"}),
     ("publications", {"pt": "Publicações", "en": "Publications"}),
     ("teaching", {"pt": "Ensino", "en": "Teaching"}),
-    ("physlab", {"pt": "PhysLab", "en": "PhysLab"}),
     ("about", {"pt": "Sobre", "en": "About"}),
 )
 
@@ -82,7 +78,6 @@ COMMON_HEAD_PATTERNS = (
     r'<link\s+crossorigin=""\s+href="https://fonts\.gstatic\.com"\s+rel="preconnect"\s*/?>',
     r'<link\s+href="https://fonts\.googleapis\.com/css2\?family=Source\+Serif\+4:opsz,wght@8\.\.60,400;8\.\.60,600;8\.\.60,700&amp;family=Public\+Sans:wght@400;500;600&amp;display=swap"\s+rel="stylesheet"\s*/?>',
     r'<link\s+href="/css/styles\.css"\s+rel="stylesheet"\s*/?>',
-    r'<link\s+href="/css/physlab\.css\?v=2"\s+rel="stylesheet"\s*/?>',
 )
 
 
@@ -255,12 +250,7 @@ def render_page(lang: str, key: str) -> str:
         main = replace_tokens(main, {"PUBLICATION_LIST": render_publications(lang)})
     elif key == "repos":
         main = replace_tokens(main, {"REPOSITORY_LIST": render_repositories(lang)})
-    extra_style_links = []
-    if key in {"physlab", "projects"}:
-        extra_style_links.append('<link href="/css/physlab.css?v=2" rel="stylesheet"/>')
-    if key == "research":
-        extra_style_links.append('<link href="/css/research.css?v=1" rel="stylesheet"/>')
-    extra_styles = "\n".join(extra_style_links)
+    extra_styles = ""
     return replace_tokens(
         read(TEMPLATES / "base.html"),
         {
@@ -341,7 +331,6 @@ def render_sitemap() -> str:
         alternates = {"pt": pt_url, "en": en_url, "x-default": f"{base}/"}
         entries.append(sitemap_entry(pt_url, alternates))
         entries.append(sitemap_entry(en_url, alternates))
-    entries.append(sitemap_entry(f"{base}/en/projects/lstm_ftw/", {"en": f"{base}/en/projects/lstm_ftw/", "x-default": f"{base}/"}))
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'

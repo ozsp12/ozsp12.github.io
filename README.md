@@ -4,14 +4,14 @@ Bilingual personal and academic website published with GitHub Pages: https://ozs
 
 The site is static and generated deterministically from shared templates and structured data. The root URL (`/`) serves the canonical English homepage directly; `/en/` is preserved as the explicit English route and canonicalizes to `/`, while `/pt/` contains the Portuguese version.
 
-`Projects` is part of the primary navigation and presents selected software, data science, AI, and computational work with demonstrable outputs. `Code` remains a secondary page under `About`, providing the broader index of public GitHub repositories.
+The primary navigation is intentionally compact: Home, Research, Publications, Teaching, and About. Public code remains available through GitHub and the secondary repository index linked from About.
 
 ## Structure
 
 ```text
 ozsp12.github.io/
 ├── index.html                  # generated canonical English homepage at /
-├── en/                         # generated English pages and project pages
+├── en/                         # generated English pages
 ├── pt/                         # generated Portuguese pages
 ├── data/
 │   ├── publications.json       # publication source data
@@ -30,7 +30,7 @@ ozsp12.github.io/
     └── validate-integrations.yml # scheduled external-integration checks
 ```
 
-Generated pages should be updated through `templates/` and `data/`, then regenerated with the build script rather than maintained independently. Standalone project dashboards may live below their corresponding project route, such as `/en/projects/lstm_ftw/`. Research is presented as CSS-driven horizontal thematic rails, while research and project card media is versioned locally under `assets/`.
+Generated pages should be updated through `templates/` and `data/`, then regenerated with the build script rather than maintained independently. Research uses the same restrained, text-first editorial structure as Teaching, without decorative card media.
 
 ## Maintenance
 
@@ -38,10 +38,9 @@ Generated pages should be updated through `templates/` and `data/`, then regener
 python scripts/build_site.py
 python scripts/build_site.py --check
 python scripts/validate_site.py
-node scripts/validate_lstm_dashboard.mjs
 ```
 
-The main CI validates build synchronization and idempotence, site structure, the LSTM dashboard structure, HTML and accessibility semantics. External live-data checks run separately so upstream availability does not block the deterministic site build.
+The main CI validates build synchronization and idempotence, site structure, HTML, and accessibility semantics.
 
 ## Researcher
 
