@@ -9,9 +9,23 @@
   --text-muted: #5B6270;
   --border: #E1DDD3;
   --accent: #1F3B4D;
+  --accent-dark: #15303F;
   --accent-soft: rgba(31, 59, 77, 0.12);
   --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
   --sans: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --bg: #171A1F;
+  --bg-alt: #1F2329;
+  --text: #E8E6E1;
+  --text-muted: #AAAEB7;
+  --border: #373C45;
+  --accent: #8CB8CE;
+  --accent-dark: #B4D4E3;
+  --accent-soft: rgba(140, 184, 206, 0.16);
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -98,6 +112,26 @@ img { max-width: 100%; display: block; }
 .lang-btn:hover { text-decoration: none; color: var(--accent); }
 .lang-btn.active { color: var(--accent); }
 .lang-sep { color: var(--border); font-size: 13px; }
+
+.theme-btn {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  padding: 4px 2px;
+  cursor: pointer;
+}
+.theme-btn:hover,
+.theme-btn:focus-visible {
+  color: var(--accent);
+}
+.theme-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
 
 .hamburger {
   display: none;
@@ -270,7 +304,7 @@ main { display: block; }
 /* Footer */
 .site-footer { border-top: 1px solid var(--border); padding: 32px; text-align: center; background: var(--bg-alt); }
 .footer-line { font-family: var(--sans); font-size: 13px; color: var(--text-muted); margin: 0 0 4px; }
-.footer-tagline { font-family: var(--sans); font-size: 12px; color: #70695C; margin: 0; letter-spacing: 0.02em; }
+.footer-tagline { font-family: var(--sans); font-size: 12px; color: var(--text-muted); margin: 0; letter-spacing: 0.02em; }
 
 @media (max-width: 560px) {
   .header-inner,
