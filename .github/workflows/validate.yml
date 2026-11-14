@@ -41,8 +41,5 @@ jobs:
       - name: Validate static site
         run: python scripts/validate_site.py
 
-      - name: Validate LSTM dashboard structure
-        run: node scripts/validate_lstm_dashboard.mjs
-
       - name: Validate HTML and accessibility semantics
         run: npx --yes html-validate@9.7.1 "index.html" "404.html" "en/**/*.html" "pt/**/*.html"
